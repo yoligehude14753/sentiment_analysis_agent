@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>舆情解析任务 - 舆情分析系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-tasks"></i> 舆情解析任务</h1>
+            <p>选择数据源并执行舆情分析任务</p>
+            <div class="header-actions">
+                <a href="/" class="btn btn-outline">
+                    <i class="fas fa-home"></i> 返回主页
+                </a>
+                <a href="/" class="btn btn-outline">
+                    <i class="fas fa-chart-bar"></i> 查看结果
+                </a>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- 左侧：任务配置 -->
+            <div class="task-config-section">
+                <h2><i class="fas fa-cog"></i> 任务配置</h2>
+                
+                <!-- 数据源选择 -->
+                <div class="config-group">
+                    <label for="dataSource">选择数据源：</label>
+                    <select id="dataSource" class="form-control">
+                        <option value="舆情数据库">舆情数据库</option>
+                        <option value="自定义数据库">自定义数据库</option>
+                        <option value="外部API">外部API</option>
+                    </select>
+                </div>
+
+                <!-- 数据库配置 -->
+                <div id="databaseConfig" class="config-group">
+                    <label for="databaseType">数据库类型：</label>
+                    <select id="databaseType" class="form-control">
+                        <option value="sqlite">SQLite</option>
+                        <option value="mysql">MySQL</option>
+                        <option value="postgresql">PostgreSQL</option>
+                        <option value="mongodb">MongoDB</option>
+                    </select>
+                    
+                    <div id="customDatabaseConfig" class="sub-config hidden">
+                        <label for="databaseHost">数据库地址：</label>
+                        <input type="text" id="databaseHost" class="form-control" placeholder="localhost">
+                        
+                        <label for="databasePort">端口：</label>
+                        <input type="number" id="databasePort" class="form-control" placeholder="3306">
+                        
+                        <label for="databaseName">数据库名：</label>
+                        <input type="text" id="databaseName" class="form-control" placeholder="database_name">
+                        
+                        <label for="databaseUser">用户名：</label>
+                        <input type="text" id="databaseUser" class="form-control" placeholder="username">
+                        
+                        <label for="databasePassword">密码：</label>
+                        <input type="password" id="databasePassword" class="form-control" placeholder="password">
+                    </div>
+                </div>
+
+                <!-- 时间范围选择 -->
+                <div class="config-group">
+                    <label>时间范围选择：</label>
+                    <div class="time-range-selector">
+                        <label for="timeField">时间字段：</label>
+                        <select id="timeField" class="form-control">
+                            <option value="publish_time">发布时间</option>
+                            <option value="custom">自定义字段</option>
+                        </select>
+                        
+                        <div id="customTimeField" class="sub-config hidden">
+                            <label for="customTimeFieldName">自定义时间字段名：</label>
+                            <input type="text" id="customTimeFieldName" class="form-control" placeholder="输入字段名">
+                        </div>
+                        
+                        <div class="time-range-inputs">
+                            <label for="startTime">开始时间：</label>
+                            <input type="datetime-local" id="startTime" class="form-control">
+                            
+                            <label for="endTime">结束时间：</label>
+                            <input type="datetime-local" id="endTime" class="form-control">
+                        </div>
+                        
+                        <div class="quick-time-options">
+                            <button type="button" class="btn btn-sm btn-outline" onclick="setQuickTimeRange('today')">今天</button>
+                            <button type="button" class="btn btn-sm btn-outline" onclick="setQuickTimeRange('yesterday')">昨天</button>
+                            <button type="button" class="btn btn-sm btn-outline" onclick="setQuickTimeRange('week')">最近7天</button>
+                            <button type="button" class="btn btn-sm btn-outline" onclick="setQuickTimeRange('month')">最近30天</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 数据量预览 -->
+                <div id="dataPreview" class="config-group hidden">
+                    <label>数据量预览：</label>
+                    <div class="data-preview-info">
+                        <div class="preview-item">
+                            <span class="label">选定时间范围：</span>
+                            <span id="selectedTimeRange" class="value">--</span>
+                        </div>
+                        <div class="preview-item">
+                            <span class="label">需要解析的数据量：</span>
+                            <span id="dataCount" class="value">--</span>
+                        </div>
+                        <div class="preview-item">
+                            <span class="label">预计处理时间：</span>
+                            <span id="estimatedProcessTime" class="value">--</span>
+                        </div>
+                    </div>
+                    <button id="refreshDataCountBtn" class="btn btn-sm btn-info">
+                        <i class="fas fa-sync-alt"></i> 刷新数据量
+                    </button>
+                </div>
+
+                <!-- 分析配置 -->
+                <div class="config-group">
+                    <label>分析配置：</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="enableSentiment" checked>
+                            <span class="checkmark"></span>
+                            情感分析
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="enableTags" checked>
+                            <span class="checkmark"></span>
+                            标签分类
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="enableCompanies" checked>
+                            <span class="checkmark"></span>
+                            企业识别
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="enableDuplication" checked>
+                            <span class="checkmark"></span>
+                            重复度检测
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 结果存储配置 -->
+                <div class="config-group">
+                    <label>结果存储配置：</label>
+                    <div class="storage-config">
+                        <label for="resultDatabase">结果数据库：</label>
+                        <select id="resultDatabase" class="form-control">
+                            <option value="analysis_results">分析结果数据库</option>
+                            <option value="custom">自定义数据库</option>
+                        </select>
+                        
+                        <div id="customResultConfig" class="sub-config hidden">
+                            <label for="resultDbHost">数据库地址：</label>
+                            <input type="text" id="resultDbHost" class="form-control" placeholder="localhost">
+                            
+                            <label for="resultDbPort">端口：</label>
+                            <input type="number" id="resultDbPort" class="form-control" placeholder="3306">
+                            
+                            <label for="resultDbName">数据库名：</label>
+                            <input type="text" id="resultDbName" class="form-control" placeholder="analysis_results">
+                            
+                            <label for="resultDbUser">用户名：</label>
+                            <input type="text" id="resultDbUser" class="form-control" placeholder="username">
+                            
+                            <label for="resultDbPassword">密码：</label>
+                            <input type="password" id="resultDbPassword" class="form-control" placeholder="password">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 执行按钮 -->
+                <div class="button-group">
+                    <button id="startTaskBtn" class="btn btn-primary">
+                        <i class="fas fa-play"></i> 开始执行
+                    </button>
+                    <button id="analyzeLatestBtn" class="btn btn-info">
+                        <i class="fas fa-clock"></i> 分析最新数据
+                    </button>
+                    <button id="stopTaskBtn" class="btn btn-danger hidden">
+                        <i class="fas fa-stop"></i> 停止任务
+                    </button>
+                    <button id="resetTaskBtn" class="btn btn-secondary">
+                        <i class="fas fa-redo"></i> 重置配置
+                    </button>
+                </div>
+
+                <!-- 任务统计 -->
+                <div class="task-stats">
+                    <h3><i class="fas fa-chart-pie"></i> 任务统计</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">总数据量</span>
+                            <span id="totalData" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">已处理</span>
+                            <span id="processedData" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">成功率</span>
+                            <span id="successRate" class="stat-value">0%</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">预计剩余时间</span>
+                            <span id="estimatedTime" class="stat-value">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：任务执行和进度 -->
+            <div class="task-execution-section">
+                <h2><i class="fas fa-play-circle"></i> 任务执行</h2>
+                
+                <!-- 任务状态 -->
+                <div id="taskStatus" class="task-status">
+                    <div class="status-indicator">
+                        <i class="fas fa-circle status-idle"></i>
+                        <span>等待开始</span>
+                    </div>
+                </div>
+
+                <!-- 执行进度 -->
+                <div id="executionProgress" class="execution-progress hidden">
+                    <h3><i class="fas fa-chart-line"></i> 执行进度</h3>
+                    
+                    <!-- 总体进度条 -->
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="overallProgress"></div>
+                        <span class="progress-text" id="progressText">0%</span>
+                    </div>
+
+                    <!-- 当前处理项 -->
+                    <div class="current-item">
+                        <h4>当前处理：</h4>
+                        <div id="currentItemInfo" class="item-info">
+                            <p>等待开始...</p>
+                        </div>
+                    </div>
+
+                    <!-- 实时日志 -->
+                    <div class="real-time-log">
+                        <h4><i class="fas fa-terminal"></i> 实时日志</h4>
+                        <div id="logContainer" class="log-container">
+                            <div class="log-entry">
+                                <span class="log-time">--:--:--</span>
+                                <span class="log-message">系统就绪，等待任务开始...</span>
+                            </div>
+                        </div>
+                        <div class="log-controls">
+                            <button id="clearLogBtn" class="btn btn-sm btn-secondary">
+                                <i class="fas fa-trash"></i> 清空日志
+                            </button>
+                            <button id="exportLogBtn" class="btn btn-sm btn-info">
+                                <i class="fas fa-download"></i> 导出日志
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 错误统计 -->
+                    <div class="error-summary hidden" id="errorSummary">
+                        <h4><i class="fas fa-exclamation-triangle"></i> 错误统计</h4>
+                        <div id="errorList" class="error-list">
+                            <!-- 错误项将在这里动态添加 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 任务完成 -->
+                <div id="taskComplete" class="task-complete hidden">
+                    <div class="completion-summary">
+                        <i class="fas fa-check-circle success-icon"></i>
+                        <h3>任务执行完成！</h3>
+                        <p>所有数据已成功分析并存储到结果数据库</p>
+                        
+                        <div class="completion-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">总处理数据</span>
+                                <span id="finalTotal" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">成功处理</span>
+                                <span id="finalSuccess" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">处理失败</span>
+                                <span id="finalFailed" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">总耗时</span>
+                                <span id="finalTime" class="stat-value">--</span>
+                            </div>
+                        </div>
+
+                        <div class="completion-actions">
+                            <a href="/" class="btn btn-primary">
+                                <i class="fas fa-chart-bar"></i> 查看分析结果
+                            </a>
+                            <button id="exportResultsBtn" class="btn btn-success">
+                                <i class="fas fa-download"></i> 导出结果
+                            </button>
+                            <button id="newTaskBtn" class="btn btn-secondary">
+                                <i class="fas fa-plus"></i> 新建任务
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部信息 -->
+        <footer class="footer">
+            <p>&copy; 2024 舆情分析系统 | 基于AI大模型的智能舆情分析平台</p>
+        </footer>
+    </div>
+
+    <!-- 任务配置确认模态框 -->
+    <div id="taskConfirmModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>确认任务配置</h3>
+                <span class="close" id="closeTaskModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="task-config-summary">
+                    <h4>任务配置摘要：</h4>
+                    <div class="config-summary-item">
+                        <span class="label">数据源：</span>
+                        <span id="confirmDataSource"></span>
+                    </div>
+                    <div class="config-summary-item">
+                        <span class="label">数据范围：</span>
+                        <span id="confirmDataRange"></span>
+                    </div>
+                    <div class="config-summary-item">
+                        <span class="label">分析模块：</span>
+                        <span id="confirmAnalysisModules"></span>
+                    </div>
+                    <div class="config-summary-item">
+                        <span class="label">预计数据量：</span>
+                        <span id="confirmDataCount"></span>
+                    </div>
+                </div>
+                <div class="warning-message">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>确认开始执行后，系统将开始分析选定的数据。此过程可能需要较长时间，请确保网络连接稳定。</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="confirmTaskBtn" class="btn btn-primary">
+                    <i class="fas fa-play"></i> 确认开始
+                </button>
+                <button id="cancelTaskBtn" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> 取消
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', path='/parsing_tasks.js') }}"></script>
+</body>
+</html>

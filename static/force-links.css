@@ -1,0 +1,80 @@
+/* 强制链接样式 - 最高优先级 */
+/* 这个文件专门用于强制应用标题链接样式 */
+
+/* 重置所有可能的链接样式 */
+a.title-link,
+.title-link,
+.result-title a.title-link,
+.result-title .title-link,
+.result-header .result-title a.title-link,
+.result-header .result-title .title-link,
+.result-item .result-title a.title-link,
+.result-item .result-title .title-link,
+.result-header h3 a.title-link,
+.result-header h3 .title-link {
+    color: #2563eb !important;
+    text-decoration: underline !important;
+    text-decoration-color: #2563eb !important;
+    text-decoration-thickness: 1px !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+    font-weight: 600 !important;
+    display: inline-block !important;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+}
+
+/* 悬停效果 */
+a.title-link:hover,
+.title-link:hover,
+.result-title a.title-link:hover,
+.result-title .title-link:hover,
+.result-header .result-title a.title-link:hover,
+.result-header .result-title .title-link:hover,
+.result-item .result-title a.title-link:hover,
+.result-item .result-title .title-link:hover,
+.result-header h3 a.title-link:hover,
+.result-header h3 .title-link:hover {
+    color: #1d4ed8 !important;
+    text-decoration: underline !important;
+    text-decoration-color: #1d4ed8 !important;
+    text-decoration-thickness: 2px !important;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+}
+
+/* 激活状态 */
+a.title-link:active,
+.title-link:active,
+.result-title a.title-link:active,
+.result-title .title-link:active,
+.result-header .result-title a.title-link:active,
+.result-header .result-title .title-link:active,
+.result-item .result-title a.title-link:active,
+.result-item .result-title .title-link:active,
+.result-header h3 a.title-link:active,
+.result-header h3 .title-link:active {
+    color: #1e40af !important;
+    text-decoration: underline !important;
+    text-decoration-color: #1e40af !important;
+    text-decoration-thickness: 3px !important;
+}
+
+/* 访问过的链接 */
+a.title-link:visited,
+.title-link:visited,
+.result-title a.title-link:visited,
+.result-title .title-link:visited,
+.result-header .result-title a.title-link:visited,
+.result-header .result-title .title-link:visited,
+.result-item .result-title a.title-link:visited,
+.result-item .result-title .title-link:visited,
+.result-header h3 a.title-link:visited,
+.result-header h3 .title-link:visited {
+    color: #7c3aed !important;
+    text-decoration: underline !important;
+    text-decoration-color: #7c3aed !important;
+}
+

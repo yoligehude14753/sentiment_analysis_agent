@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分析结果展示 - 舆情分析系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-chart-bar"></i> 分析结果展示</h1>
+            <p>查看已解析的舆情数据和分析结果</p>
+            <div class="header-actions">
+                <a href="/" class="btn btn-outline">
+                    <i class="fas fa-home"></i> 返回主页
+                </a>
+                <a href="/parsing" class="btn btn-outline">
+                    <i class="fas fa-tasks"></i> 执行任务
+                </a>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- 左侧：搜索结果和列表 -->
+            <div class="search-results-section">
+                <h2><i class="fas fa-search"></i> 数据搜索</h2>
+                
+                <!-- 搜索框 -->
+                <div class="search-box">
+                    <div class="search-input-group">
+                        <input type="text" id="searchInput" placeholder="输入关键词搜索标题、内容或标签..." class="search-input">
+                        <button id="searchBtn" class="btn btn-primary">
+                            <i class="fas fa-search"></i> 搜索
+                        </button>
+                    </div>
+                    
+                    <!-- 高级搜索选项 -->
+                    <div class="advanced-search">
+                        <button id="toggleAdvancedBtn" class="btn btn-sm btn-outline">
+                            <i class="fas fa-filter"></i> 筛选
+                        </button>
+                        <div id="advancedOptions" class="advanced-options hidden">
+                            <div class="filter-row">
+                                <div class="filter-group">
+                                    <label for="sentimentFilter">情感等级：</label>
+                                    <select id="sentimentFilter" class="form-control">
+                                        <option value="">全部</option>
+                                        <option value="正面">正面</option>
+                                        <option value="中性">中性</option>
+                                        <option value="负面一级">负面一级</option>
+                                        <option value="负面二级">负面二级</option>
+                                        <option value="负面三级">负面三级</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="filter-row">
+                                <div class="filter-group">
+                                    <label for="tagFilter">风险标签：</label>
+                                    <select id="tagFilter" class="form-control">
+                                        <option value="">全部</option>
+                                        <!-- 公司治理与合规风险类 -->
+                                        <option value="同业竞争">同业竞争</option>
+                                        <option value="股权与控制权">股权与控制权</option>
+                                        <option value="关联交易">关联交易</option>
+                                        <option value="历史沿革与股东核查">历史沿革与股东核查</option>
+                                        <option value="重大违法违规">重大违法违规</option>
+                                        <!-- 财务真实性与经营能力类 -->
+                                        <option value="收入与成本">收入与成本</option>
+                                        <option value="财务内控不规范">财务内控不规范</option>
+                                        <option value="客户与供应商">客户与供应商</option>
+                                        <option value="资产质量与减值">资产质量与减值</option>
+                                        <option value="研发与技术">研发与技术</option>
+                                        <!-- 发行与市场风险类 -->
+                                        <option value="募集资金用途">募集资金用途</option>
+                                        <option value="突击分红与对赌协议">突击分红与对赌协议</option>
+                                        <option value="市场传闻与负面报道">市场传闻与负面报道</option>
+                                        <option value="行业政策与环境">行业政策与环境</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="dateFilter">发布时间：</label>
+                                    <select id="dateFilter" class="form-control">
+                                        <option value="">全部时间</option>
+                                        <option value="today">今天</option>
+                                        <option value="week">本周</option>
+                                        <option value="month">本月</option>
+                                        <option value="quarter">本季度</option>
+                                        <option value="year">本年</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 搜索结果统计 -->
+                <div class="search-stats">
+                    <div class="stats-info">
+                        <span class="search-total" id="resultCount">0</span> 条结果
+                        <span class="search-time" id="searchTime">搜索用时: 0.00秒</span>
+                    </div>
+                </div>
+
+                <!-- 搜索结果列表 -->
+                <div class="results-container">
+                    <!-- 表格头部 -->
+                    <div class="results-header">
+                        <div class="header-cell title-cell">标题</div>
+                        <div class="header-cell summary-cell">摘要</div>
+                        <div class="header-cell date-cell">发布时间</div>
+                        <div class="header-cell tags-cell">标签</div>
+                        <div class="header-cell sentiment-cell">情感等级</div>
+                        <div class="header-cell company-cell">匹配的公司</div>
+                    </div>
+                    <!-- 搜索结果项 -->
+                    <div id="resultsList" class="results-list">
+                        <!-- 搜索结果项将在这里动态添加 -->
+                    </div>
+                    <div id="noResults" class="no-results hidden">未找到匹配的结果</div>
+                </div>
+
+                    <!-- 分页控件 -->
+                    <div class="pagination hidden" id="pagination">
+                        <button id="prevPageBtn" class="btn btn-sm btn-outline">
+                            <i class="fas fa-chevron-left"></i> 上一页
+                        </button>
+                        <span class="page-info">
+                            第 <span id="currentPage">1</span> 页，共 <span id="totalPages">1</span> 页
+                        </span>
+                        <button id="nextPageBtn" class="btn btn-sm btn-outline">
+                            下一页 <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：文章详情 -->
+            <div class="article-detail-section">
+                <h2><i class="fas fa-file-text"></i> 文章详情</h2>
+                
+                <!-- 文章选择提示 -->
+                <div id="articlePrompt" class="article-prompt">
+                    <i class="fas fa-hand-pointer"></i>
+                    <h3>选择文章查看详情</h3>
+                    <p>在左侧搜索结果中点击文章标题，即可在此处查看完整的文章内容和分析结果</p>
+                </div>
+
+                <!-- 文章详情内容 -->
+                <div id="articleDetail" class="article-detail hidden">
+                    <!-- 文章头部信息 -->
+                    <div class="article-header">
+                        <h3 id="articleTitle" class="article-title"></h3>
+                        <div class="article-meta">
+                            <span class="meta-item">
+                                <i class="fas fa-calendar"></i>
+                                <span id="articlePublishTime"></span>
+                            </span>
+                            <span class="meta-item">
+                                <i class="fas fa-database"></i>
+                                <span id="articleDataSource"></span>
+                            </span>
+                            <span class="meta-item">
+                                <i class="fas fa-clock"></i>
+                                <span id="articleAnalysisTime"></span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- 分析结果概览 -->
+                    <div class="analysis-overview">
+                        <div class="overview-item">
+                            <span class="label">情感等级：</span>
+                            <span id="articleSentiment" class="sentiment-badge"></span>
+                        </div>
+                        <div class="overview-item">
+                            <span class="label">风险标签：</span>
+                            <div id="articleTags" class="tags-container"></div>
+                        </div>
+                        <div class="overview-item">
+                            <span class="label">涉及企业：</span>
+                            <div id="articleCompanies" class="companies-container"></div>
+                        </div>
+                        <div class="overview-item">
+                            <span class="label">重复度：</span>
+                            <span id="articleDuplicateStatus"></span>
+                        </div>
+                    </div>
+
+                    <!-- 文章内容 -->
+                    <div class="article-content">
+                        <h4><i class="fas fa-align-left"></i> 文章内容</h4>
+                        <div id="articleContent" class="content-text"></div>
+                    </div>
+
+                    <!-- 详细分析结果 -->
+                    <div class="detailed-analysis">
+                        <h4><i class="fas fa-chart-line"></i> 详细分析</h4>
+                        
+                        <!-- 情感分析详情 -->
+                        <div class="analysis-section">
+                            <h5><i class="fas fa-heart"></i> 情感分析</h5>
+                            <div class="analysis-content">
+                                <div class="analysis-item">
+                                    <span class="label">情感等级：</span>
+                                    <span id="detailSentimentLevel"></span>
+                                </div>
+                                <div class="analysis-item">
+                                    <span class="label">分析原因：</span>
+                                    <div id="detailSentimentReason" class="reason-text"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 标签分析详情 -->
+                        <div class="analysis-section">
+                            <h5><i class="fas fa-tags"></i> 标签分析</h5>
+                            <div id="detailTags" class="analysis-content">
+                                <!-- 标签详情将在这里动态添加 -->
+                            </div>
+                        </div>
+
+                        <!-- 企业识别详情 -->
+                        <div class="analysis-section">
+                            <h5><i class="fas fa-building"></i> 企业识别</h5>
+                            <div id="detailCompanies" class="analysis-content">
+                                <!-- 企业详情将在这里动态添加 -->
+                            </div>
+                        </div>
+
+                        <!-- 重复度分析详情 -->
+                        <div class="analysis-section">
+                            <h5><i class="fas fa-fingerprint"></i> 重复度分析</h5>
+                            <div class="analysis-content">
+                                <div class="analysis-item">
+                                    <span class="label">重复状态：</span>
+                                    <span id="detailDuplicateStatus"></span>
+                                </div>
+                                <div class="analysis-item">
+                                    <span class="label">相似度：</span>
+                                    <span id="detailSimilarityScore"></span>
+                                </div>
+                                <div class="analysis-item">
+                                    <span class="label">重复组ID：</span>
+                                    <span id="detailDuplicateGroup"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 操作按钮 -->
+                    <div class="article-actions">
+                        <button id="exportArticleBtn" class="btn btn-success">
+                            <i class="fas fa-download"></i> 导出文章
+                        </button>
+                        <button id="shareArticleBtn" class="btn btn-info">
+                            <i class="fas fa-share"></i> 分享
+                        </button>
+                        <button id="printArticleBtn" class="btn btn-secondary">
+                            <i class="fas fa-print"></i> 打印
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部信息 -->
+        <footer class="footer">
+            <p>&copy; 2024 舆情分析系统 | 基于AI大模型的智能舆情分析平台</p>
+        </footer>
+    </div>
+
+    <!-- 导出选项模态框 -->
+    <div id="exportModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>导出选项</h3>
+                <span class="close" id="closeExportModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="export-options">
+                    <div class="export-format">
+                        <label>导出格式：</label>
+                        <div class="format-options">
+                            <label class="radio-item">
+                                <input type="radio" name="exportFormat" value="excel" checked>
+                                <span class="radio-mark"></span>
+                                Excel (.xlsx)
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="exportFormat" value="csv">
+                                <span class="radio-mark"></span>
+                                CSV (.csv)
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="exportFormat" value="pdf">
+                                <span class="radio-mark"></span>
+                                PDF (.pdf)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="export-content">
+                        <label>导出内容：</label>
+                        <div class="content-options">
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="exportBasic" checked>
+                                <span class="checkmark"></span>
+                                基本信息（标题、发布时间、数据源）
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="exportAnalysis" checked>
+                                <span class="checkmark"></span>
+                                分析结果（情感、标签、企业）
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="exportContent" checked>
+                                <span class="checkmark"></span>
+                                文章内容
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="exportDetails">
+                                <span class="checkmark"></span>
+                                详细分析原因
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="confirmExportBtn" class="btn btn-primary">
+                    <i class="fas fa-download"></i> 确认导出
+                </button>
+                <button id="cancelExportBtn" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> 取消
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', path='/results_display.js') }}"></script>
+</body>
+</html>

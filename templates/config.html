@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent配置 - 舆情分析系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-cog"></i> Agent配置</h1>
+            <p>配置阿里云通义千问以及系统参数</p>
+            <div class="header-actions">
+                <button id="backBtn" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> 返回主页
+                </button>
+            </div>
+        </header>
+
+        <div class="main-content" style="grid-template-columns: 1fr;">
+            <div class="input-section">
+                <h2><i class="fas fa-sliders-h"></i> 基础配置</h2>
+
+                <div class="input-group">
+                    <label for="aliApiKey">阿里云API Key：</label>
+                    <input type="password" id="aliApiKey" placeholder="请输入DASHSCOPE_API_KEY" style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;">
+                </div>
+
+                <div class="input-group">
+                    <label for="aliModelName">模型名称：</label>
+                    <input type="text" id="aliModelName" placeholder="例如：qwen-turbo" style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;">
+                </div>
+
+                <div class="input-group">
+                    <label for="aliBaseUrl">API Base URL：</label>
+                    <input type="text" id="aliBaseUrl" placeholder="https://dashscope.aliyuncs.com/compatible-mode/v1" style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;">
+                </div>
+
+                <h2 style="margin-top:20px;"><i class="fas fa-server"></i> 服务参数</h2>
+                <div class="input-group">
+                    <label for="host">Host：</label>
+                    <input type="text" id="host" placeholder="0.0.0.0" style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;">
+                </div>
+                <div class="input-group">
+                    <label for="port">Port：</label>
+                    <input type="number" id="port" placeholder="8000" style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;">
+                </div>
+                <div class="input-group">
+                    <label for="debug">调试模式：</label>
+                    <select id="debug" style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;">
+                        <option value="true">开启</option>
+                        <option value="false">关闭</option>
+                    </select>
+                </div>
+
+                <h2 style="margin-top:20px;"><i class="fas fa-wrench"></i> 分析参数</h2>
+                <div class="input-group">
+                    <label for="maxContentLength">最大内容长度：</label>
+                    <input type="number" id="maxContentLength" placeholder="2000" style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;">
+                </div>
+                <div class="input-group">
+                    <label for="batchSize">批处理大小：</label>
+                    <input type="number" id="batchSize" placeholder="100" style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;">
+                </div>
+
+
+
+                <h2 style="margin-top:20px;"><i class="fas fa-robot"></i> Agent专用提示词</h2>
+                <div class="agent-prompts-section">
+                    <button id="toggleAllAgents" class="btn btn-secondary" style="margin-bottom:15px;">
+                        <i class="fas fa-chevron-down"></i> 展开/折叠所有Agent提示词
+                    </button>
+
+                    <!-- 情感分析提示词 -->
+                    <div class="agent-prompt-group">
+                        <h3 style="color:#2d3748; border-bottom:2px solid #e2e8f0; padding-bottom:5px; margin-bottom:15px;">
+                            <i class="fas fa-heart"></i> 情感分析提示词
+                        </h3>
+                        <div class="agent-prompt-item">
+                            <div class="agent-prompt-header" onclick="toggleAgentPrompt('情感分析')">
+                                <h4><i class="fas fa-chevron-right"></i> 情感分析提示词</h4>
+                                <span class="agent-prompt-toggle">点击展开</span>
+                            </div>
+                            <div class="agent-prompt-content" id="content-情感分析">
+                                <textarea id="prompt-情感分析" rows="8" placeholder="请输入情感分析的专用提示词..." style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;"></textarea>
+                                <div class="button-group" style="margin-top:10px;">
+                                    <button onclick="saveSingleAgentPrompt('情感分析')" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-save"></i> 保存
+                                    </button>
+                                    <button onclick="resetAgentPrompt('情感分析')" class="btn btn-secondary btn-sm">
+                                        <i class="fas fa-undo"></i> 重置
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 企业识别提示词 -->
+                    <div class="agent-prompt-group">
+                        <h3 style="color:#2d3748; border-bottom:2px solid #e2e8f0; padding-bottom:5px; margin-bottom:15px;">
+                            <i class="fas fa-building"></i> 企业识别提示词
+                        </h3>
+                        <div class="agent-prompt-item">
+                            <div class="agent-prompt-header" onclick="toggleAgentPrompt('企业识别')">
+                                <h4><i class="fas fa-chevron-right"></i> 企业识别提示词</h4>
+                                <span class="agent-prompt-toggle">点击展开</span>
+                            </div>
+                            <div class="agent-prompt-content" id="content-企业识别">
+                                <textarea id="prompt-企业识别" rows="8" placeholder="请输入企业识别的专用提示词..." style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;"></textarea>
+                                <div class="button-group" style="margin-top:10px;">
+                                    <button onclick="saveSingleAgentPrompt('企业识别')" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-save"></i> 保存
+                                    </button>
+                                    <button onclick="resetAgentPrompt('企业识别')" class="btn btn-secondary btn-sm">
+                                        <i class="fas fa-undo"></i> 重置
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="agent-prompts-container">
+                        <!-- 公司治理与合规风险 -->
+                        <div class="agent-prompt-group">
+                            <h3 style="color:#2d3748; border-bottom:2px solid #e2e8f0; padding-bottom:5px; margin-bottom:15px;">
+                                <i class="fas fa-building"></i> 公司治理与合规风险
+                            </h3>
+
+                            <div class="agent-prompt-item">
+                                <div class="agent-prompt-header" onclick="toggleAgentPrompt('同业竞争')">
+                                    <h4><i class="fas fa-chevron-right"></i> 同业竞争</h4>
+                                    <span class="agent-prompt-toggle">点击展开</span>
+                                </div>
+                                <div class="agent-prompt-content" id="content-同业竞争">
+                                    <textarea id="prompt-同业竞争" rows="8" placeholder="请输入同业竞争分析的专用提示词..." style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;"></textarea>
+                                    <div class="button-group" style="margin-top:10px;">
+                                        <button onclick="saveSingleAgentPrompt('同业竞争')" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-save"></i> 保存
+                                        </button>
+                                        <button onclick="resetAgentPrompt('同业竞争')" class="btn btn-secondary btn-sm">
+                                            <i class="fas fa-undo"></i> 重置
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="agent-prompt-item">
+                                <div class="agent-prompt-header" onclick="toggleAgentPrompt('股权与控制权')">
+                                    <h4><i class="fas fa-chevron-right"></i> 股权与控制权</h4>
+                                    <span class="agent-prompt-toggle">点击展开</span>
+                                </div>
+                                <div class="agent-prompt-content" id="content-股权与控制权">
+                                    <textarea id="prompt-股权与控制权" rows="8" placeholder="请输入股权与控制权分析的专用提示词..." style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;"></textarea>
+                                    <div class="button-group" style="margin-top:10px;">
+                                        <button onclick="saveSingleAgentPrompt('股权与控制权')" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-save"></i> 保存
+                                        </button>
+                                        <button onclick="resetAgentPrompt('股权与控制权')" class="btn btn-secondary btn-sm">
+                                            <i class="fas fa-undo"></i> 重置
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="agent-prompt-item">
+                                <div class="agent-prompt-header" onclick="toggleAgentPrompt('关联交易')">
+                                    <h4><i class="fas fa-chevron-right"></i> 关联交易</h4>
+                                    <span class="agent-prompt-toggle">点击展开</span>
+                                </div>
+                                <div class="agent-prompt-content" id="content-关联交易">
+                                    <textarea id="prompt-关联交易" rows="8" placeholder="请输入关联交易分析的专用提示词..." style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;"></textarea>
+                                    <div class="button-group" style="margin-top:10px;">
+                                        <button onclick="saveSingleAgentPrompt('关联交易')" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-save"></i> 保存
+                                        </button>
+                                        <button onclick="resetAgentPrompt('关联交易')" class="btn btn-secondary btn-sm">
+                                            <i class="fas fa-undo"></i> 重置
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="agent-prompt-item">
+                                <div class="agent-prompt-header" onclick="toggleAgentPrompt('历史沿革与股东核查')">
+                                    <h4><i class="fas fa-chevron-right"></i> 历史沿革与股东核查</h4>
+                                    <span class="agent-prompt-toggle">点击展开</span>
+                                </div>
+                                <div class="agent-prompt-content" id="content-历史沿革与股东核查">
+                                    <textarea id="prompt-历史沿革与股东核查" rows="8" placeholder="请输入历史沿革与股东核查分析的专用提示词..." style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;"></textarea>
+                                    <div class="button-group" style="margin-top:10px;">
+                                        <button onclick="saveSingleAgentPrompt('历史沿革与股东核查')" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-save"></i> 保存
+                                        </button>
+                                        <button onclick="resetAgentPrompt('历史沿革与股东核查')" class="btn btn-secondary btn-sm">
+                                            <i class="fas fa-undo"></i> 重置
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="agent-prompt-item">
+                                <div class="agent-prompt-header" onclick="toggleAgentPrompt('重大违法违规')">
+                                    <h4><i class="fas fa-chevron-right"></i> 重大违法违规</h4>
+                                    <span class="agent-prompt-toggle">点击展开</span>
+                                </div>
+                                <div class="agent-prompt-content" id="content-重大违法违规">
+                                    <textarea id="prompt-重大违法违规" rows="8" placeholder="请输入重大违法违规分析的专用提示词..." style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;"></textarea>
+                                    <div class="button-group" style="margin-top:10px;">
+                                        <button onclick="saveSingleAgentPrompt('重大违法违规')" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-save"></i> 保存
+                                        </button>
+                                        <button onclick="resetAgentPrompt('重大违法违规')" class="btn btn-secondary btn-sm">
+                                            <i class="fas fa-undo"></i> 重置
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 财务真实性与经营能力 -->
+                        <div class="agent-prompt-group">
+                            <h3 style="color:#2d3748; border-bottom:2px solid #e2e8f0; padding-bottom:5px; margin-bottom:15px;">
+                                <i class="fas fa-chart-line"></i> 财务真实性与经营能力
+                            </h3>
+
+                            <div class="agent-prompt-item">
+                                <div class="agent-prompt-header" onclick="toggleAgentPrompt('收入与成本')">
+                                    <h4><i class="fas fa-chevron-right"></i> 收入与成本</h4>
+                                    <span class="agent-prompt-toggle">点击展开</span>
+                                </div>
+                                <div class="agent-prompt-content" id="content-收入与成本">
+                                    <textarea id="prompt-收入与成本" rows="8" placeholder="请输入收入与成本分析的专用提示词..." style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;"></textarea>
+                                    <div class="button-group" style="margin-top:10px;">
+                                        <button onclick="saveSingleAgentPrompt('收入与成本')" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-save"></i> 保存
+                                        </button>
+                                        <button onclick="resetAgentPrompt('收入与成本')" class="btn btn-secondary btn-sm">
+                                            <i class="fas fa-undo"></i> 重置
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="agent-prompt-item">
+                                <div class="agent-prompt-header" onclick="toggleAgentPrompt('财务内控不规范')">
+                                    <h4><i class="fas fa-chevron-right"></i> 财务内控不规范</h4>
+                                    <span class="agent-prompt-toggle">点击展开</span>
+                                </div>
+                                <div class="agent-prompt-content" id="content-财务内控不规范">
+                                    <textarea id="prompt-财务内控不规范" rows="8" placeholder="请输入财务内控不规范分析的专用提示词..." style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;"></textarea>
+                                    <div class="button-group" style="margin-top:10px;">
+                                        <button onclick="saveSingleAgentPrompt('财务内控不规范')" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-save"></i> 保存
+                                        </button>
+                                        <button onclick="resetAgentPrompt('财务内控不规范')" class="btn btn-secondary btn-sm">
+                                            <i class="fas fa-undo"></i> 重置
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="agent-prompt-item">
+                                <div class="agent-prompt-header" onclick="toggleAgentPrompt('客户与供应商')">
+                                    <h4><i class="fas fa-chevron-right"></i> 客户与供应商</h4>
+                                    <span class="agent-prompt-toggle">点击展开</span>
+                                </div>
+                                <div class="agent-prompt-content" id="content-客户与供应商">
+                                    <textarea id="prompt-客户与供应商" rows="8" placeholder="请输入客户与供应商分析的专用提示词..." style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;"></textarea>
+                                    <div class="button-group" style="margin-top:10px;">
+                                        <button onclick="saveSingleAgentPrompt('客户与供应商')" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-save"></i> 保存
+                                        </button>
+                                        <button onclick="resetAgentPrompt('客户与供应商')" class="btn btn-secondary btn-sm">
+                                            <i class="fas fa-undo"></i> 重置
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="agent-prompt-item">
+                                <div class="agent-prompt-header" onclick="toggleAgentPrompt('资产质量与减值')">
+                                    <h4><i class="fas fa-chevron-right"></i> 资产质量与减值</h4>
+                                    <span class="agent-prompt-toggle">点击展开</span>
+                                </div>
+                                <div class="agent-prompt-content" id="content-资产质量与减值">
+                                    <textarea id="prompt-资产质量与减值" rows="8" placeholder="请输入资产质量与减值分析的专用提示词..." style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;"></textarea>
+                                    <div class="button-group" style="margin-top:10px;">
+                                        <button onclick="saveSingleAgentPrompt('资产质量与减值')" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-save"></i> 保存
+                                        </button>
+                                        <button onclick="resetAgentPrompt('资产质量与减值')" class="btn btn-secondary btn-sm">
+                                            <i class="fas fa-undo"></i> 重置
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="agent-prompt-item">
+                                <div class="agent-prompt-header" onclick="toggleAgentPrompt('研发与技术')">
+                                    <h4><i class="fas fa-chevron-right"></i> 研发与技术</h4>
+                                    <span class="agent-prompt-toggle">点击展开</span>
+                                </div>
+                                <div class="agent-prompt-content" id="content-研发与技术">
+                                    <textarea id="prompt-研发与技术" rows="8" placeholder="请输入研发与技术分析的专用提示词..." style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;"></textarea>
+                                    <div class="button-group" style="margin-top:10px;">
+                                        <button onclick="saveSingleAgentPrompt('研发与技术')" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-save"></i> 保存
+                                        </button>
+                                        <button onclick="resetAgentPrompt('研发与技术')" class="btn btn-secondary btn-sm">
+                                            <i class="fas fa-undo"></i> 重置
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 发行与市场风险 -->
+                        <div class="agent-prompt-group">
+                            <h3 style="color:#2d3748; border-bottom:2px solid #e2e8f0; padding-bottom:5px; margin-bottom:15px;">
+                                <i class="fas fa-chart-bar"></i> 发行与市场风险
+                            </h3>
+
+                            <div class="agent-prompt-item">
+                                <div class="agent-prompt-header" onclick="toggleAgentPrompt('募集资金用途')">
+                                    <h4><i class="fas fa-chevron-right"></i> 募集资金用途</h4>
+                                    <span class="agent-prompt-toggle">点击展开</span>
+                                </div>
+                                <div class="agent-prompt-content" id="content-募集资金用途">
+                                    <textarea id="prompt-募集资金用途" rows="8" placeholder="请输入募集资金用途分析的专用提示词..." style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;"></textarea>
+                                    <div class="button-group" style="margin-top:10px;">
+                                        <button onclick="saveSingleAgentPrompt('募集资金用途')" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-save"></i> 保存
+                                        </button>
+                                        <button onclick="resetAgentPrompt('募集资金用途')" class="btn btn-secondary btn-sm">
+                                            <i class="fas fa-undo"></i> 重置
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="agent-prompt-item">
+                                <div class="agent-prompt-header" onclick="toggleAgentPrompt('突击分红与对赌协议')">
+                                    <h4><i class="fas fa-chevron-right"></i> 突击分红与对赌协议</h4>
+                                    <span class="agent-prompt-toggle">点击展开</span>
+                                </div>
+                                <div class="agent-prompt-content" id="content-突击分红与对赌协议">
+                                    <textarea id="prompt-突击分红与对赌协议" rows="8" placeholder="请输入突击分红与对赌协议分析的专用提示词..." style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;"></textarea>
+                                    <div class="button-group" style="margin-top:10px;">
+                                        <button onclick="saveSingleAgentPrompt('突击分红与对赌协议')" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-save"></i> 保存
+                                        </button>
+                                        <button onclick="resetAgentPrompt('突击分红与对赌协议')" class="btn btn-secondary btn-sm">
+                                            <i class="fas fa-undo"></i> 重置
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="agent-prompt-item">
+                                <div class="agent-prompt-header" onclick="toggleAgentPrompt('市场传闻与负面报道')">
+                                    <h4><i class="fas fa-chevron-right"></i> 市场传闻与负面报道</h4>
+                                    <span class="agent-prompt-toggle">点击展开</span>
+                                </div>
+                                <div class="agent-prompt-content" id="content-市场传闻与负面报道">
+                                    <textarea id="prompt-市场传闻与负面报道" rows="8" placeholder="请输入市场传闻与负面报道分析的专用提示词..." style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;"></textarea>
+                                    <div class="button-group" style="margin-top:10px;">
+                                        <button onclick="saveSingleAgentPrompt('市场传闻与负面报道')" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-save"></i> 保存
+                                        </button>
+                                        <button onclick="resetAgentPrompt('市场传闻与负面报道')" class="btn btn-secondary btn-sm">
+                                            <i class="fas fa-undo"></i> 重置
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 行业政策与环境 -->
+                        <div class="agent-prompt-group">
+                            <h3 style="color:#2d3748; border-bottom:2px solid #e2e8f0; padding-bottom:5px; margin-bottom:15px;">
+                                <i class="fas fa-leaf"></i> 行业政策与环境
+                            </h3>
+
+                            <div class="agent-prompt-item">
+                                <div class="agent-prompt-header" onclick="toggleAgentPrompt('行业政策与环境')">
+                                    <h4><i class="fas fa-chevron-right"></i> 行业政策与环境</h4>
+                                    <span class="agent-prompt-toggle">点击展开</span>
+                                </div>
+                                <div class="agent-prompt-content" id="content-行业政策与环境">
+                                    <textarea id="prompt-行业政策与环境" rows="8" placeholder="请输入行业政策与环境分析的专用提示词..." style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;"></textarea>
+                                    <div class="button-group" style="margin-top:10px;">
+                                        <button onclick="saveSingleAgentPrompt('行业政策与环境')" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-save"></i> 保存
+                                        </button>
+                                        <button onclick="resetAgentPrompt('行业政策与环境')" class="btn btn-secondary btn-sm">
+                                            <i class="fas fa-undo"></i> 重置
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="button-group" style="margin-top:20px;">
+                        <button id="saveAllAgentPrompts" class="btn btn-primary">
+                            <i class="fas fa-save"></i> 保存所有Agent提示词
+                        </button>
+                        <button id="resetAllAgentPrompts" class="btn btn-secondary">
+                            <i class="fas fa-undo"></i> 重置所有Agent提示词
+                        </button>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button id="saveBtn" class="btn btn-primary">
+                        <i class="fas fa-save"></i> 保存配置
+                    </button>
+                    <button id="reloadBtn" class="btn btn-info">
+                        <i class="fas fa-sync-alt"></i> 重新加载
+                    </button>
+                </div>
+
+                <div id="configMessage" class="error hidden"></div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>&copy; 2024 舆情分析系统 | 配置中心</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', path='/config.js') }}"></script>
+</body>
+<!-- 该页面复用全局样式，无额外CSS文件 -->
+</html>
+

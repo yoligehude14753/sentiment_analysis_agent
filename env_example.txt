@@ -1,0 +1,22 @@
+# 舆情分析Agent系统环境配置
+# 请将此文件复制为 .env 并填入您的实际配置
+
+# 阿里大模型API配置
+# 请访问 https://dashscope.aliyun.com/ 获取API密钥
+ALI_API_KEY=sk-9b5466e0eb8d48d9907f0c3c8fe384d8
+ALI_API_SECRET=your_api_secret_here
+ALI_MODEL_NAME=qwen3
+ALI_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
+
+# 服务器配置
+HOST=0.0.0.0
+PORT=8000
+DEBUG=True
+
+# 说明：
+# 1. ALI_API_KEY: 阿里大模型API访问密钥
+# 2. ALI_API_SECRET: 阿里大模型API访问密钥
+# 3. ALI_MODEL_NAME: 使用的模型名称，推荐使用 qwen-turbo
+# 4. HOST: 服务器监听地址，0.0.0.0 表示监听所有地址
+# 5. PORT: 服务器端口号
+# 6. DEBUG: 是否开启调试模式，生产环境建议设置为 False 

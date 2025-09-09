@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>舆情数据管理 - 数据库管理</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .database-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .section h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        
+        .btn:hover {
+            background: #0056b3;
+        }
+        
+        .btn-success {
+            background: #28a745;
+        }
+        
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .data-table th,
+        .data-table td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        .data-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .data-table tr:hover {
+            background: #e9ecef;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        .pagination button {
+            margin: 0 5px;
+        }
+        
+        .pagination span {
+            margin: 0 10px;
+        }
+        
+        .field-config {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .field-item {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            background: #f8f9fa;
+        }
+        
+        .field-item h4 {
+            margin-top: 0;
+            color: #333;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            gap: 15px;
+            margin: 10px 0;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="database-container">
+        <h1>舆情数据管理</h1>
+        
+        <!-- 数据导入部分 -->
+        <div class="section">
+            <h2>数据导入</h2>
+            <div class="form-group">
+                <label for="csvPath">CSV文件路径:</label>
+                <input type="text" id="csvPath" class="form-control" 
+                       value="C:\Users\anyut\Desktop\建投需求\舆情解析\舆情数据.csv" readonly>
+            </div>
+            <div class="form-group">
+                <label for="chunkSize">批处理大小:</label>
+                <input type="number" id="chunkSize" class="form-control" value="1000" min="100" max="10000">
+            </div>
+            <button class="btn btn-success" onclick="importData()">导入数据</button>
+            <button class="btn btn-warning" onclick="checkData()">检查数据</button>
+        </div>
+        
+        <!-- 数据统计部分 -->
+        <div class="section">
+            <h2>数据统计</h2>
+            <button class="btn" onclick="loadStatistics()">刷新统计</button>
+            <div id="statisticsContainer"></div>
+        </div>
+        
+        <!-- 字段配置部分 -->
+        <div class="section">
+            <h2>字段配置</h2>
+            <button class="btn" onclick="loadFieldConfig()">刷新配置</button>
+            <div id="fieldConfigContainer"></div>
+        </div>
+        
+        <!-- 数据查询部分 -->
+        <div class="section">
+            <h2>数据查询</h2>
+            <div class="form-group">
+                <label for="searchQuery">搜索关键词:</label>
+                <input type="text" id="searchQuery" class="form-control" placeholder="输入搜索关键词...">
+            </div>
+            <div class="form-group">
+                <label for="pageSize">每页显示:</label>
+                <select id="pageSize" class="form-control">
+                    <option value="10">10条</option>
+                    <option value="25">25条</option>
+                    <option value="50" selected>50条</option>
+                    <option value="100">100条</option>
+                </select>
+            </div>
+            <button class="btn" onclick="searchData()">搜索</button>
+            <button class="btn btn-warning" onclick="resetSearch()">重置</button>
+            <div id="dataContainer"></div>
+        </div>
+        
+        <!-- 消息提示 -->
+        <div id="messageContainer"></div>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentPage = 1;
+        let totalPages = 0;
+        let totalRecords = 0;
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStatistics();
+            loadFieldConfig();
+        });
+        
+        // 显示消息
+        function showMessage(message, type = 'info') {
+            const container = document.getElementById('messageContainer');
+            container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+        
+        // 导入数据
+        async function importData() {
+            const csvPath = document.getElementById('csvPath').value;
+            const chunkSize = parseInt(document.getElementById('chunkSize').value);
+            
+            if (!csvPath) {
+                showMessage('请输入CSV文件路径', 'error');
+                return;
+            }
+            
+            try {
+                showMessage('正在导入数据，请稍候...', 'info');
+                
+                const response = await fetch('/api/database/import', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `csv_path=${encodeURIComponent(csvPath)}&chunk_size=${chunkSize}`
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage(result.message, 'success');
+                    loadStatistics(); // 刷新统计信息
+                } else {
+                    showMessage(result.message || '导入失败', 'error');
+                }
+            } catch (error) {
+                showMessage(`导入失败: ${error.message}`, 'error');
+            }
+        }
+        
+        // 检查数据
+        async function checkData() {
+            try {
+                const response = await fetch('/api/database/data?page_size=1');
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage(`数据库中共有 ${result.total} 条记录`, 'info');
+                } else {
+                    showMessage('检查数据失败', 'error');
+                }
+            } catch (error) {
+                showMessage(`检查数据失败: ${error.message}`, 'error');
+            }
+        }
+        
+        // 加载统计信息
+        async function loadStatistics() {
+            try {
+                const response = await fetch('/api/database/statistics');
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayStatistics(result.statistics);
+                } else {
+                    showMessage('加载统计信息失败', 'error');
+                }
+            } catch (error) {
+                showMessage(`加载统计信息失败: ${error.message}`, 'error');
+            }
+        }
+        
+        // 显示统计信息
+        function displayStatistics(stats) {
+            const container = document.getElementById('statisticsContainer');
+            
+            let html = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">${stats.total_records}</div>
+                        <div class="stat-label">总记录数</div>
+                    </div>
+            `;
+            
+            if (stats.sentiment_distribution) {
+                for (const [level, count] of Object.entries(stats.sentiment_distribution)) {
+                    html += `
+                        <div class="stat-card">
+                            <div class="stat-number">${count}</div>
+                            <div class="stat-label">${level}</div>
+                        </div>
+                    `;
+                }
+            }
+            
+            html += '</div>';
+            
+            if (stats.industry_distribution) {
+                html += '<h3>行业分布 (前10)</h3><div class="stats-grid">';
+                for (const [industry, count] of Object.entries(stats.industry_distribution)) {
+                    html += `
+                        <div class="stat-card">
+                            <div class="stat-number">${count}</div>
+                            <div class="stat-label">${industry}</div>
+                        </div>
+                    `;
+                }
+                html += '</div>';
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        // 加载字段配置
+        async function loadFieldConfig() {
+            try {
+                const response = await fetch('/api/database/fields');
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayFieldConfig(result.fields);
+                } else {
+                    showMessage('加载字段配置失败', 'error');
+                }
+            } catch (error) {
+                showMessage(`加载字段配置失败: ${error.message}`, 'error');
+            }
+        }
+        
+        // 显示字段配置
+        function displayFieldConfig(fields) {
+            const container = document.getElementById('fieldConfigContainer');
+            
+            let html = '<div class="field-config">';
+            
+            fields.forEach(field => {
+                html += `
+                    <div class="field-item">
+                        <h4>${field.display_name} (${field.field_name})</h4>
+                        <div class="form-group">
+                            <label for="display_name_${field.field_name}">显示名称:</label>
+                            <input type="text" id="display_name_${field.field_name}" name="display_name_${field.field_name}" class="form-control" value="${field.display_name}" 
+                                   onchange="updateFieldConfig('${field.field_name}', 'display_name', this.value)">
+                        </div>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" ${field.is_visible ? 'checked' : ''} 
+                                       onchange="updateFieldConfig('${field.field_name}', 'is_visible', this.checked)">
+                                可见
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" ${field.is_searchable ? 'checked' : ''} 
+                                       onchange="updateFieldConfig('${field.field_name}', 'is_searchable', this.checked)">
+                                可搜索
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" ${field.is_filterable ? 'checked' : ''} 
+                                       onchange="updateFieldConfig('${field.field_name}', 'is_filterable', this.checked)">
+                                可过滤
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="display_order_${field.field_name}">显示顺序:</label>
+                            <input type="number" id="display_order_${field.field_name}" name="display_order_${field.field_name}" class="form-control" value="${field.display_order}" 
+                                   onchange="updateFieldConfig('${field.field_name}', 'display_order', parseInt(this.value))">
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        
+        // 更新字段配置
+        async function updateFieldConfig(fieldName, property, value) {
+            try {
+                // 先获取当前配置
+                const response = await fetch('/api/database/fields');
+                const result = await response.json();
+                
+                if (result.success) {
+                    const field = result.fields.find(f => f.field_name === fieldName);
+                    if (field) {
+                        // 更新属性
+                        field[property] = value;
+                        
+                        // 发送更新请求
+                        const updateResponse = await fetch(`/api/database/fields/${fieldName}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(field)
+                        });
+                        
+                        const updateResult = await updateResponse.json();
+                        
+                        if (updateResult.success) {
+                            showMessage(`字段 ${fieldName} 配置更新成功`, 'success');
+                        } else {
+                            showMessage(updateResult.message || '更新失败', 'error');
+                        }
+                    }
+                }
+            } catch (error) {
+                showMessage(`更新字段配置失败: ${error.message}`, 'error');
+            }
+        }
+        
+        // 搜索数据
+        async function searchData() {
+            const searchQuery = document.getElementById('searchQuery').value;
+            const pageSize = parseInt(document.getElementById('pageSize').value);
+            
+            currentPage = 1;
+            await loadData(searchQuery, pageSize);
+        }
+        
+        // 重置搜索
+        function resetSearch() {
+            document.getElementById('searchQuery').value = '';
+            currentPage = 1;
+            loadData('', 50);
+        }
+        
+        // 加载数据
+        async function loadData(search = '', pageSize = 50) {
+            try {
+                const params = new URLSearchParams({
+                    page: currentPage,
+                    page_size: pageSize
+                });
+                
+                if (search) {
+                    params.append('search', search);
+                }
+                
+                const response = await fetch(`/api/database/data?${params}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayData(result);
+                } else {
+                    showMessage('加载数据失败', 'error');
+                }
+            } catch (error) {
+                showMessage(`加载数据失败: ${error.message}`, 'error');
+            }
+        }
+        
+        // 显示数据
+        function displayData(result) {
+            const container = document.getElementById('dataContainer');
+            
+            if (!result.data || result.data.length === 0) {
+                container.innerHTML = '<p>暂无数据</p>';
+                return;
+            }
+            
+            totalPages = result.total_pages;
+            totalRecords = result.total;
+            
+            // 构建表格
+            let html = `
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>标题</th>
+                                <th>来源</th>
+                                <th>发布时间</th>
+                                <th>公司名称</th>
+                                <th>行业</th>
+                                <th>情感等级</th>
+                                <th>风险标签</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            result.data.forEach(item => {
+                html += `
+                    <tr>
+                        <td>${item.title || ''}</td>
+                        <td>${item.source || ''}</td>
+                        <td>${item.publish_time || ''}</td>
+                        <td>${item.company_name || ''}</td>
+                        <td>${item.industry || ''}</td>
+                        <td>${item.sentiment_level || ''}</td>
+                        <td>${item.risk_tags || ''}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            // 添加分页
+            if (totalPages > 1) {
+                html += '<div class="pagination">';
+                
+                if (currentPage > 1) {
+                    html += `<button class="btn" onclick="changePage(${currentPage - 1})">上一页</button>`;
+                }
+                
+                html += `<span>第 ${currentPage} 页，共 ${totalPages} 页 (总计 ${totalRecords} 条)</span>`;
+                
+                if (currentPage < totalPages) {
+                    html += `<button class="btn" onclick="changePage(${currentPage + 1})">下一页</button>`;
+                }
+                
+                html += '</div>';
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        // 切换页面
+        async function changePage(page) {
+            currentPage = page;
+            const searchQuery = document.getElementById('searchQuery').value;
+            const pageSize = parseInt(document.getElementById('pageSize').value);
+            await loadData(searchQuery, pageSize);
+        }
+        
+        // 页面大小改变时重新加载
+        document.getElementById('pageSize').addEventListener('change', function() {
+            currentPage = 1;
+            const searchQuery = document.getElementById('searchQuery').value;
+            const pageSize = parseInt(this.value);
+            loadData(searchQuery, pageSize);
+        });
+    </script>
+</body>
+</html>
