@@ -3,7 +3,7 @@
 ## 您的系统已配置完成！
 
 ### ✅ 已配置信息
-- **API密钥**: sk-9b5466e0eb8d48d9907f0c3c8fe384d8
+- **API密钥**: 请访问阿里云获取您的API密钥
 - **模型**: qwen3
 - **API地址**: https://dashscope.aliyuncs.com/compatible-mode/v1
 

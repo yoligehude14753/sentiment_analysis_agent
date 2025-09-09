@@ -14,6 +14,7 @@ import io
 import time
 from models import AnalysisRequest, CompanyInfo, TagResult, SentimentResult
 from config import Config
+from api_key_manager import api_key_manager, ensure_api_key_configured
 from agents.company_agent import CompanyAgent
 from agents.tag_agents import TagAgents
 from agents.sentiment_agent import SentimentAgent
@@ -25,6 +26,7 @@ from database_config_api import router as database_config_router
 from analysis_api import router as analysis_router
 from data_api import router as data_router
 from results_api import router as results_router
+from api_config_routes import router as api_config_router
 import asyncio
 import json
 import logging
@@ -66,6 +68,7 @@ app.include_router(database_config_router)
 app.include_router(analysis_router)
 app.include_router(data_router, prefix="/api/data")
 app.include_router(results_router, prefix="/api/results")
+app.include_router(api_config_router)
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):

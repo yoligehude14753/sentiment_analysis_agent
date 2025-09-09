@@ -3,7 +3,7 @@
 
 # 阿里大模型API配置
 # 请访问 https://dashscope.aliyun.com/ 获取API密钥
-ALI_API_KEY=sk-9b5466e0eb8d48d9907f0c3c8fe384d8
+ALI_API_KEY=your_dashscope_api_key_here
 ALI_API_SECRET=your_api_secret_here
 ALI_MODEL_NAME=qwen3
 ALI_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1

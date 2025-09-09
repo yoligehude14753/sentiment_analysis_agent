@@ -5,7 +5,17 @@ load_dotenv()
 
 class Config:
     # 阿里云通义千问API配置
-    ALI_API_KEY = os.getenv("DASHSCOPE_API_KEY", "sk-9b5466e0eb8d48d9907f0c3c8fe384d8")
+    @classmethod
+    def get_ali_api_key(cls):
+        """获取阿里云API密钥"""
+        try:
+            from api_key_manager import api_key_manager
+            return api_key_manager.get_api_key("dashscope")
+        except ImportError:
+            # 如果API密钥管理器不可用，回退到环境变量
+            return os.getenv("DASHSCOPE_API_KEY")
+    
+    ALI_API_KEY = get_ali_api_key.__func__()
     ALI_MODEL_NAME = os.getenv("ALI_MODEL_NAME", "qwen-turbo")  # 使用qwen-turbo模型
     ALI_BASE_URL = os.getenv("ALI_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")  # 阿里云通义千问API端点
     

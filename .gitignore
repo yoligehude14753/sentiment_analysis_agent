@@ -117,6 +117,8 @@ node_modules/
 
 # Configuration files with sensitive data
 config/database_config.json
+config/.api_keys
+config/.cipher_key
 
 # Large model files
 *.model

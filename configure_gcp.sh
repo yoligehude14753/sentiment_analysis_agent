@@ -90,7 +90,7 @@ sudo -u sentiment bash -c "
 print_info "创建环境配置文件..."
 sudo -u sentiment tee /var/www/sentiment-analysis/.env > /dev/null << 'EOF'
 # 阿里云通义千问API配置
-DASHSCOPE_API_KEY=sk-9b5466e0eb8d48d9907f0c3c8fe384d8
+DASHSCOPE_API_KEY=your_dashscope_api_key_here
 ALI_MODEL_NAME=qwen-turbo
 ALI_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
 
