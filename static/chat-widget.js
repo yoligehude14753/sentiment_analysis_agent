@@ -17,6 +17,7 @@ class ChatWidget {
         this.createWidget();
         this.bindEvents();
         this.loadWelcomeMessage();
+        this.loadModelInfo();
     }
     
     createWidget() {
@@ -68,7 +69,15 @@ class ChatWidget {
             
             <!-- 知识库设置面板 -->
             <div class="chat-widget-kb-panel">
-                <div class="chat-widget-kb-title">选择知识库字段</div>
+                <div class="chat-widget-kb-title">AI模型与知识库设置</div>
+                
+                <!-- 模型信息显示 -->
+                <div class="chat-widget-model-info">
+                    <div class="chat-widget-model-label">当前模型：</div>
+                    <div class="chat-widget-model-name" id="chatWidgetModelName">加载中...</div>
+                </div>
+                
+                <div class="chat-widget-kb-subtitle">选择知识库字段</div>
                 <div class="chat-widget-kb-options">
                     <label class="chat-widget-kb-option">
                         <input type="checkbox" value="title" checked>
@@ -387,6 +396,42 @@ class ChatWidget {
         if (this.isOpen && results && results.length > 0) {
             const infoMessage = `✅ 搜索结果已更新，共找到 ${results.length} 条结果。\n现在您可以基于这些数据向我提问了！`;
             this.addMessage('ai', infoMessage);
+        }
+    }
+    
+    async loadModelInfo() {
+        try {
+            const response = await fetch('/api/chat/model-info');
+            const data = await response.json();
+            
+            if (data.success) {
+                const modelNameElement = document.getElementById('chatWidgetModelName');
+                if (modelNameElement) {
+                    // 根据模型名称显示友好的名称
+                    const modelNames = {
+                        'qwen-turbo': '通义千问-Turbo',
+                        'qwen-plus': '通义千问-Plus', 
+                        'qwen-max': '通义千问-Max',
+                        'qwen-max-longcontext': '通义千问-Max-LongContext'
+                    };
+                    
+                    const friendlyName = modelNames[data.model_name] || data.model_name;
+                    modelNameElement.textContent = friendlyName;
+                    modelNameElement.title = `模型: ${data.model_name}`;
+                }
+            } else {
+                console.error('获取模型信息失败:', data.error);
+                const modelNameElement = document.getElementById('chatWidgetModelName');
+                if (modelNameElement) {
+                    modelNameElement.textContent = '未知模型';
+                }
+            }
+        } catch (error) {
+            console.error('加载模型信息时出错:', error);
+            const modelNameElement = document.getElementById('chatWidgetModelName');
+            if (modelNameElement) {
+                modelNameElement.textContent = '加载失败';
+            }
         }
     }
 }

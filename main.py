@@ -15,6 +15,7 @@ import time
 from models import AnalysisRequest, CompanyInfo, TagResult, SentimentResult
 from config import Config
 from api_key_manager import api_key_manager, ensure_api_key_configured
+import getpass
 from agents.company_agent import CompanyAgent
 from agents.tag_agents import TagAgents
 from agents.sentiment_agent import SentimentAgent
@@ -724,5 +725,71 @@ async def update_config(payload: dict):
     return {"message": "配置已更新（进程内）", "updated": updated}
 
 
+def setup_api_key():
+    """在启动时要求用户输入API密钥"""
+    print("=" * 60)
+    print("🚀 舆情分析系统启动")
+    print("=" * 60)
+    
+    # 检查是否已有API密钥
+    try:
+        if api_key_manager.get_api_key():
+            print("✅ 检测到已配置的API密钥")
+            return
+    except:
+        pass
+    
+    print("\n📝 请配置阿里云API密钥以启用智能分析功能")
+    print("💡 您可以在阿里云控制台获取API密钥")
+    print("🔗 获取地址: https://dashscope.console.aliyun.com/")
+    
+    while True:
+        try:
+            api_key = getpass.getpass("\n请输入您的阿里云API密钥: ").strip()
+            
+            if not api_key:
+                print("❌ API密钥不能为空，请重新输入")
+                continue
+                
+            # 验证API密钥格式（简单验证）
+            if len(api_key) < 20:
+                print("❌ API密钥格式不正确，请检查后重新输入")
+                continue
+            
+            # 保存API密钥
+            api_key_manager.set_api_key(api_key)
+            
+            # 自动保存到配置文件
+            try:
+                config = Config()
+                # 这里可以添加其他默认配置
+                print("✅ API密钥配置成功！")
+                print("💾 配置已自动保存到系统")
+            except Exception as e:
+                print(f"⚠️  API密钥已保存，但配置保存失败: {e}")
+            
+            break
+            
+        except KeyboardInterrupt:
+            print("\n\n👋 用户取消启动")
+            exit(0)
+        except Exception as e:
+            print(f"❌ 配置API密钥时出错: {e}")
+            continue
+    
+    print("\n🎉 系统配置完成，正在启动服务...")
+    print("=" * 60)
+
+
 if __name__ == "__main__":
+    # 启动时配置API密钥
+    setup_api_key()
+    
+    print("🌐 服务启动中...")
+    print("📍 访问地址: http://localhost:8000")
+    print("📊 管理界面: http://localhost:8000/config")
+    print("💬 智能聊天: 点击右下角聊天图标")
+    print("\n按 Ctrl+C 停止服务")
+    print("=" * 60)
+    
     uvicorn.run(app, host="0.0.0.0", port=8000) 

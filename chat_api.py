@@ -10,6 +10,7 @@ import json
 import logging
 from agents.ali_llm_client import AliLLMClient
 from database_manager import UnifiedDatabaseManager
+from config import Config
 
 logger = logging.getLogger(__name__)
 
@@ -50,8 +51,12 @@ async def chat_with_ai(
         if not request.message or not request.message.strip():
             raise HTTPException(status_code=400, detail="问题不能为空")
         
-        # 初始化LLM客户端
-        llm_client = AliLLMClient()
+        # 初始化LLM客户端，使用当前配置的模型
+        config = Config()
+        llm_client = AliLLMClient(
+            model_name=config.ALI_MODEL_NAME,
+            base_url=config.ALI_BASE_URL
+        )
         
         # 构建上下文信息
         context_info = _build_context(
@@ -197,17 +202,45 @@ async def get_chat_status():
     """获取聊天服务状态"""
     try:
         # 检查LLM服务是否可用
-        llm_client = AliLLMClient()
+        config = Config()
+        llm_client = AliLLMClient(
+            model_name=config.ALI_MODEL_NAME,
+            base_url=config.ALI_BASE_URL
+        )
         
         # 这里可以添加简单的健康检查
         return {
             "success": True,
             "status": "available",
-            "message": "智能问答服务正常"
+            "message": "智能问答服务正常",
+            "model": config.ALI_MODEL_NAME
         }
     except Exception as e:
         return {
             "success": False,
             "status": "unavailable", 
             "message": f"智能问答服务不可用: {str(e)}"
+        }
+
+@router.get("/chat/model-info")
+async def get_model_info():
+    """获取当前配置的模型信息"""
+    try:
+        config = Config()
+        return {
+            "success": True,
+            "model_name": config.ALI_MODEL_NAME,
+            "base_url": config.ALI_BASE_URL,
+            "available_models": [
+                {"value": "qwen-turbo", "label": "通义千问-Turbo (快速响应)"},
+                {"value": "qwen-plus", "label": "通义千问-Plus (平衡性能)"},
+                {"value": "qwen-max", "label": "通义千问-Max (最强性能)"},
+                {"value": "qwen-max-longcontext", "label": "通义千问-Max-LongContext (长文本)"}
+            ]
+        }
+    except Exception as e:
+        logger.error(f"获取模型信息失败: {e}")
+        return {
+            "success": False,
+            "error": f"获取模型信息失败: {str(e)}"
         } 

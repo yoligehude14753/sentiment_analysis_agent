@@ -288,3 +288,4 @@ sudo systemctl restart nginx
 3. 网络连接：`curl -I http://35.209.254.98/api/health`
 4. 配置文件：`cat /var/www/sentiment-analysis/.env`
 
+

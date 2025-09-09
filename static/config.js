@@ -14,8 +14,7 @@ async function loadConfig() {
         document.getElementById('maxContentLength').value = cfg.MAX_CONTENT_LENGTH || 2000;
         document.getElementById('batchSize').value = cfg.BATCH_SIZE || 100;
 
-        // 加载API密钥状态
-        await loadApiKeyStatus();
+        // API密钥已在启动时配置，无需在此处处理
 
         // 加载Agent提示词
         if (cfg.AGENT_PROMPTS) {
@@ -31,82 +30,11 @@ async function loadConfig() {
     }
 }
 
-async function loadApiKeyStatus() {
-    try {
-        const res = await fetch('/api/config/api-key-status');
-        const result = await res.json();
-        
-        if (res.ok && result.success) {
-            const status = result.data;
-            const apiKeyInput = document.getElementById('aliApiKey');
-            
-            if (status.configured) {
-                apiKeyInput.placeholder = `已配置 (${status.masked_key}) - 来源: ${status.source}`;
-                // 创建状态指示器
-                updateApiKeyStatusIndicator(true, status);
-            } else {
-                apiKeyInput.placeholder = '请输入您的DashScope API密钥';
-                updateApiKeyStatusIndicator(false);
-            }
-        }
-    } catch (e) {
-        console.error('加载API密钥状态失败:', e);
-    }
-}
-
-function updateApiKeyStatusIndicator(configured, status = null) {
-    // 移除已存在的状态指示器
-    const existingIndicator = document.querySelector('.api-key-status');
-    if (existingIndicator) {
-        existingIndicator.remove();
-    }
-    
-    const apiKeyGroup = document.getElementById('aliApiKey').closest('.input-group');
-    const indicator = document.createElement('div');
-    indicator.className = 'api-key-status';
-    indicator.style.cssText = 'margin-top: 5px; font-size: 12px; padding: 5px 10px; border-radius: 5px;';
-    
-    if (configured) {
-        indicator.innerHTML = `<i class="fas fa-check-circle" style="color: #10b981;"></i> API密钥已配置 (${status.source === 'environment' ? '环境变量' : '加密存储'})`;
-        indicator.style.backgroundColor = '#d1fae5';
-        indicator.style.color = '#065f46';
-        
-        // 添加测试和删除按钮
-        const buttonContainer = document.createElement('div');
-        buttonContainer.style.cssText = 'margin-top: 10px; display: flex; gap: 10px;';
-        
-        const testBtn = document.createElement('button');
-        testBtn.innerHTML = '<i class="fas fa-vial"></i> 测试';
-        testBtn.className = 'btn btn-sm btn-info';
-        testBtn.onclick = testApiKey;
-        
-        const deleteBtn = document.createElement('button');
-        deleteBtn.innerHTML = '<i class="fas fa-trash"></i> 删除';
-        deleteBtn.className = 'btn btn-sm btn-danger';
-        deleteBtn.onclick = deleteApiKey;
-        
-        buttonContainer.appendChild(testBtn);
-        if (status.source !== 'environment') { // 只有非环境变量的密钥才能删除
-            buttonContainer.appendChild(deleteBtn);
-        }
-        
-        apiKeyGroup.appendChild(buttonContainer);
-    } else {
-        indicator.innerHTML = '<i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i> 未配置API密钥';
-        indicator.style.backgroundColor = '#fef3c7';
-        indicator.style.color = '#92400e';
-    }
-    
-    apiKeyGroup.appendChild(indicator);
-}
+// API密钥相关函数已移除，因为密钥在启动时配置
 
 async function saveConfig() {
-    // 首先保存API密钥（如果有输入）
-    const apiKeyInput = document.getElementById('aliApiKey');
-    if (apiKeyInput.value.trim()) {
-        await saveApiKey();
-    }
-
+    // API密钥已在启动时配置，此处仅保存其他配置
+    
     const payload = {
         ALI_MODEL_NAME: document.getElementById('aliModelName').value || undefined,
         ALI_BASE_URL: document.getElementById('aliBaseUrl').value || undefined,
@@ -132,79 +60,7 @@ async function saveConfig() {
     }
 }
 
-async function saveApiKey() {
-    const apiKey = document.getElementById('aliApiKey').value.trim();
-    if (!apiKey) {
-        showMessage('请输入API密钥');
-        return;
-    }
-
-    try {
-        const formData = new FormData();
-        formData.append('api_key', apiKey);
-        formData.append('provider', 'dashscope');
-
-        const res = await fetch('/api/config/save-api-key', {
-            method: 'POST',
-            body: formData
-        });
-        
-        const result = await res.json();
-        if (!res.ok) throw new Error(result.message || '保存API密钥失败');
-        
-        showMessage('API密钥保存成功！');
-        document.getElementById('aliApiKey').value = ''; // 清空输入框
-        await loadApiKeyStatus(); // 重新加载状态
-        
-    } catch (e) {
-        showMessage(e.message || '保存API密钥失败');
-    }
-}
-
-async function testApiKey() {
-    try {
-        const formData = new FormData();
-        formData.append('provider', 'dashscope');
-        
-        const res = await fetch('/api/config/test-api-key', {
-            method: 'POST',
-            body: formData
-        });
-        
-        const result = await res.json();
-        if (result.success) {
-            showMessage('✅ API密钥测试成功！');
-        } else {
-            showMessage('❌ ' + (result.message || 'API密钥测试失败'));
-        }
-        
-    } catch (e) {
-        showMessage('❌ 测试API密钥失败: ' + e.message);
-    }
-}
-
-async function deleteApiKey() {
-    if (!confirm('确定要删除API密钥吗？删除后需要重新配置。')) {
-        return;
-    }
-    
-    try {
-        const res = await fetch('/api/config/api-key?provider=dashscope', {
-            method: 'DELETE'
-        });
-        
-        const result = await res.json();
-        if (result.success) {
-            showMessage('API密钥已删除');
-            await loadApiKeyStatus(); // 重新加载状态
-        } else {
-            showMessage('删除失败: ' + (result.message || '未知错误'));
-        }
-        
-    } catch (e) {
-        showMessage('删除API密钥失败: ' + e.message);
-    }
-}
+// API密钥相关函数已移除，因为密钥在启动时配置
 
 function showMessage(msg) {
     const el = document.getElementById('configMessage');

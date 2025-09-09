@@ -24,13 +24,16 @@
                 <h2><i class="fas fa-sliders-h"></i> 基础配置</h2>
 
                 <div class="input-group">
-                    <label for="aliApiKey">阿里云API Key：</label>
-                    <input type="password" id="aliApiKey" placeholder="请输入DASHSCOPE_API_KEY" style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;">
-                </div>
-
-                <div class="input-group">
-                    <label for="aliModelName">模型名称：</label>
-                    <input type="text" id="aliModelName" placeholder="例如：qwen-turbo" style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;">
+                    <label for="aliModelName">选择AI模型：</label>
+                    <select id="aliModelName" style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;">
+                        <option value="qwen-turbo">通义千问-Turbo (快速响应)</option>
+                        <option value="qwen-plus">通义千问-Plus (平衡性能)</option>
+                        <option value="qwen-max">通义千问-Max (最强性能)</option>
+                        <option value="qwen-max-longcontext">通义千问-Max-LongContext (长文本)</option>
+                    </select>
+                    <small style="color:#666;margin-top:5px;display:block;">
+                        💡 API密钥已在启动时配置，此处仅选择模型类型
+                    </small>
                 </div>
 
                 <div class="input-group">
