@@ -370,12 +370,19 @@ function displaySearchResults(data) {
             searchResults.appendChild(resultRow);
         });
         
-        // 在聊天界面显示搜索结果更新提示
-        showSearchResultsUpdate(data.data.length);
+        // 通知悬浮聊天窗口搜索结果已更新
+        if (window.chatWidget) {
+            window.chatWidget.setSearchResults(data.data);
+        }
     } else {
         currentResults = [];
         window.currentResults = [];
         searchResults.innerHTML = '<div class="no-results">未找到匹配的结果</div>';
+        
+        // 通知悬浮聊天窗口搜索结果已清空
+        if (window.chatWidget) {
+            window.chatWidget.setSearchResults([]);
+        }
     }
 }
 

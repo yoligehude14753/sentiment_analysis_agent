@@ -27,6 +27,7 @@ from analysis_api import router as analysis_router
 from data_api import router as data_router
 from results_api import router as results_router
 from api_config_routes import router as api_config_router
+from chat_api import router as chat_router
 import asyncio
 import json
 import logging
@@ -69,6 +70,7 @@ app.include_router(analysis_router)
 app.include_router(data_router, prefix="/api/data")
 app.include_router(results_router, prefix="/api/results")
 app.include_router(api_config_router)
+app.include_router(chat_router)
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):

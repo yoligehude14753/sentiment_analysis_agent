@@ -6,6 +6,7 @@
     <title>舆情分析</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="stylesheet" href="/static/force-links.css">
+    <link rel="stylesheet" href="/static/chat-widget.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -116,97 +117,7 @@
                         </div>
                     </div>
 
-                    <!-- 右侧聊天区域 -->
-                    <div class="chat-section">
-                        <!-- 聊天头部 -->
-                        <div class="chat-header">
-                            <h2><i class="fas fa-robot"></i> AI智能问答</h2>
-                            <div class="chat-controls">
-                                <button class="btn btn-sm btn-secondary" onclick="toggleKnowledgeBase()">
-                                    <i class="fas fa-cog"></i> 知识库设置
-                                </button>
-                                <button class="btn btn-sm btn-secondary" onclick="clearChat()">
-                                    <i class="fas fa-trash"></i> 清空对话
-                                </button>
-                            </div>
-                        </div>
 
-                        <!-- 知识库设置面板 -->
-                        <div id="knowledgeBasePanel" class="knowledge-base-panel" style="display: none;">
-                            <h4>选择知识库字段</h4>
-                            <div class="field-selection">
-                                <label class="checkbox-item">
-                                    <input type="checkbox" id="kbTitle" checked>
-                                    <span class="checkmark"></span>
-                                    标题 (title)
-                                </label>
-                                <label class="checkbox-item">
-                                    <input type="checkbox" id="kbContent" checked>
-                                    <span class="checkmark"></span>
-                                    内容摘要 (content)
-                                </label>
-                                <label class="checkbox-item">
-                                    <input type="checkbox" id="kbTags" checked>
-                                    <span class="checkmark"></span>
-                                    标签 (tags)
-                                </label>
-                                <label class="checkbox-item">
-                                    <input type="checkbox" id="kbSentiment" checked>
-                                    <span class="checkmark"></span>
-                                    情感分析 (sentiment)
-                                </label>
-                                <label class="checkbox-item">
-                                    <input type="checkbox" id="kbCompanies" checked>
-                                    <span class="checkmark"></span>
-                                    相关公司 (companies)
-                                </label>
-                                <label class="checkbox-item">
-                                    <input type="checkbox" id="kbDate" checked>
-                                    <span class="checkmark"></span>
-                                    发布时间 (date)
-                                </label>
-                            </div>
-                            <div class="knowledge-base-info">
-                                <i class="fas fa-info-circle"></i>
-                                AI将基于选中的字段来回答您的问题
-                            </div>
-                        </div>
-
-                        <!-- 聊天消息区域 -->
-                        <div id="chatMessages" class="chat-messages">
-                            <div class="welcome-message">
-                                <div class="message ai-message">
-                                    <div class="message-avatar">
-                                        <i class="fas fa-robot"></i>
-                                    </div>
-                                    <div class="message-content">
-                                        <div class="message-text">
-                                            您好！我是AI助手，可以基于搜索结果数据库为您提供智能问答服务。
-                                            <br><br>
-                                            <strong>使用说明：</strong>
-                                            <br>• 在左侧搜索数据后，我可以基于搜索结果回答您的问题
-                                            <br>• 您可以在上方"知识库设置"中选择要包含的字段类型
-                                            <br>• 支持中文问答，请直接输入您的问题
-                                        </div>
-                                        <div class="message-time">现在</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 聊天输入区域 -->
-                        <div class="chat-input-area">
-                            <div class="chat-input-wrapper">
-                                <textarea id="chatInput" class="chat-input" placeholder="输入您的问题..." rows="2"></textarea>
-                                <button class="chat-send-btn" onclick="sendChatMessage()">
-                                    <i class="fas fa-paper-plane"></i>
-                                </button>
-                            </div>
-                            <div class="chat-tips">
-                                💡 按 Enter 发送消息，Shift+Enter 换行
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -1229,5 +1140,6 @@
         
         // 全屏和关闭详情功能已移除，改为页面跳转方式
     </script>
+    <script src="/static/chat-widget.js"></script>
 </body>
 </html> 
