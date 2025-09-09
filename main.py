@@ -651,9 +651,10 @@ async def enhanced_export(
 async def get_config():
     """获取当前配置（仅返回非敏感项和API Key掩码）"""
     masked_key = None
-    if Config.ALI_API_KEY:
+    api_key = Config.get_ali_api_key()
+    if api_key:
         # 显示后4位
-        masked_key = ("*" * max(0, len(Config.ALI_API_KEY) - 4)) + Config.ALI_API_KEY[-4:]
+        masked_key = ("*" * max(0, len(api_key) - 4)) + api_key[-4:]
     return {
         "ALI_MODEL_NAME": Config.ALI_MODEL_NAME,
         "ALI_BASE_URL": Config.ALI_BASE_URL,
@@ -731,15 +732,8 @@ def setup_api_key():
     print("🚀 舆情分析系统启动")
     print("=" * 60)
     
-    # 检查是否已有API密钥
-    try:
-        if api_key_manager.get_api_key():
-            print("✅ 检测到已配置的API密钥")
-            return
-    except:
-        pass
-    
-    print("\n📝 请配置阿里云API密钥以启用智能分析功能")
+    # 每次启动都要求输入API密钥（根据用户需求）
+    print("\n🔑 请输入阿里云API密钥以启用智能分析功能")
     print("💡 您可以在阿里云控制台获取API密钥")
     print("🔗 获取地址: https://dashscope.console.aliyun.com/")
     
@@ -751,23 +745,17 @@ def setup_api_key():
                 print("❌ API密钥不能为空，请重新输入")
                 continue
                 
-            # 验证API密钥格式（简单验证）
-            if len(api_key) < 20:
-                print("❌ API密钥格式不正确，请检查后重新输入")
+            # 验证API密钥格式
+            is_valid, message = api_key_manager.validate_api_key(api_key)
+            if not is_valid:
+                print(f"❌ {message}")
                 continue
             
-            # 保存API密钥
-            api_key_manager.set_api_key(api_key)
+            # 保存API密钥到内存中的Config（不持久化存储）
+            Config._ali_api_key = api_key
             
-            # 自动保存到配置文件
-            try:
-                config = Config()
-                # 这里可以添加其他默认配置
-                print("✅ API密钥配置成功！")
-                print("💾 配置已自动保存到系统")
-            except Exception as e:
-                print(f"⚠️  API密钥已保存，但配置保存失败: {e}")
-            
+            print("✅ API密钥配置成功！")
+            print("💡 注意：API密钥仅在本次会话中有效，重启后需要重新输入")
             break
             
         except KeyboardInterrupt:

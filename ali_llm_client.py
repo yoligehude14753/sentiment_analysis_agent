@@ -6,7 +6,7 @@ from config import Config
 
 class AliLLMClient:
     def __init__(self):
-        self.api_key = Config.ALI_API_KEY
+        self.api_key = Config.get_ali_api_key()
         self.model_name = Config.ALI_MODEL_NAME
         self.base_url = Config.ALI_BASE_URL
         
@@ -245,4 +245,26 @@ class AliLLMClient:
     
     def _parse_response(self, response: str) -> Dict:
         """兼容旧版本的响应解析"""
-        return self._parse_sentiment_response(response) 
+        return self._parse_sentiment_response(response)
+    
+    async def call_llm(self, system_prompt: str, user_message: str) -> Dict:
+        """
+        调用LLM进行对话
+        用于聊天API的异步调用
+        """
+        try:
+            # 构建完整的提示词
+            full_prompt = f"{system_prompt}\n\n用户问题：{user_message}"
+            
+            # 调用API
+            response = self._call_api(full_prompt)
+            
+            return {
+                "success": True,
+                "response": response
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e)
+            } 

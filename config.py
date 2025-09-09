@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def _get_ali_api_key():
-    """获取阿里云API密钥"""
+    """获取阿里云API密钥（延迟加载）"""
     try:
         from api_key_manager import api_key_manager
         return api_key_manager.get_api_key("dashscope")
@@ -14,7 +14,17 @@ def _get_ali_api_key():
 
 class Config:
     # 阿里云通义千问API配置
-    ALI_API_KEY = _get_ali_api_key()
+    _ali_api_key = None
+    
+    @classmethod
+    def get_ali_api_key(cls):
+        """获取阿里云API密钥（延迟加载）"""
+        if cls._ali_api_key is None:
+            cls._ali_api_key = _get_ali_api_key()
+        return cls._ali_api_key
+    
+    # 为了向后兼容，将ALI_API_KEY设为None，在首次访问时动态设置
+    ALI_API_KEY = None
     ALI_MODEL_NAME = os.getenv("ALI_MODEL_NAME", "qwen-turbo")  # 使用qwen-turbo模型
     ALI_BASE_URL = os.getenv("ALI_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")  # 阿里云通义千问API端点
     

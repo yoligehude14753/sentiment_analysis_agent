@@ -52,11 +52,7 @@ async def chat_with_ai(
             raise HTTPException(status_code=400, detail="问题不能为空")
         
         # 初始化LLM客户端，使用当前配置的模型
-        config = Config()
-        llm_client = AliLLMClient(
-            model_name=config.ALI_MODEL_NAME,
-            base_url=config.ALI_BASE_URL
-        )
+        llm_client = AliLLMClient()
         
         # 构建上下文信息
         context_info = _build_context(
@@ -203,10 +199,7 @@ async def get_chat_status():
     try:
         # 检查LLM服务是否可用
         config = Config()
-        llm_client = AliLLMClient(
-            model_name=config.ALI_MODEL_NAME,
-            base_url=config.ALI_BASE_URL
-        )
+        llm_client = AliLLMClient()
         
         # 这里可以添加简单的健康检查
         return {
