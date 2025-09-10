@@ -23,14 +23,14 @@
         </header>
 
         <div class="main-content">
-            <!-- 左侧：搜索结果和列表 -->
+            <!-- 左侧搜索结果和列表 -->
             <div class="search-results-section">
                 <h2><i class="fas fa-search"></i> 数据搜索</h2>
                 
                 <!-- 搜索框 -->
                 <div class="search-box">
                     <div class="search-input-group">
-                        <input type="text" id="searchInput" placeholder="输入关键词搜索标题、内容或标签..." class="search-input">
+                        <input type="text" id="searchInput" placeholder="输入关键词搜索标题内容或标签..." class="search-input">
                         <button id="searchBtn" class="btn btn-primary">
                             <i class="fas fa-search"></i> 搜索
                         </button>
@@ -44,7 +44,7 @@
                         <div id="advancedOptions" class="advanced-options hidden">
                             <div class="filter-row">
                                 <div class="filter-group">
-                                    <label for="sentimentFilter">情感等级：</label>
+                                    <label for="sentimentFilter">情感等级</label>
                                     <select id="sentimentFilter" class="form-control">
                                         <option value="">全部</option>
                                         <option value="正面">正面</option>
@@ -57,7 +57,7 @@
                             </div>
                             <div class="filter-row">
                                 <div class="filter-group">
-                                    <label for="tagFilter">风险标签：</label>
+                                    <label for="tagFilter">风险标签</label>
                                     <select id="tagFilter" class="form-control">
                                         <option value="">全部</option>
                                         <!-- 公司治理与合规风险类 -->
@@ -80,7 +80,7 @@
                                     </select>
                                 </div>
                                 <div class="filter-group">
-                                    <label for="dateFilter">发布时间：</label>
+                                    <label for="dateFilter">发布时间</label>
                                     <select id="dateFilter" class="form-control">
                                         <option value="">全部时间</option>
                                         <option value="today">今天</option>
@@ -127,7 +127,7 @@
                             <i class="fas fa-chevron-left"></i> 上一页
                         </button>
                         <span class="page-info">
-                            第 <span id="currentPage">1</span> 页，共 <span id="totalPages">1</span> 页
+                            第 <span id="currentPage">1</span> 页共 <span id="totalPages">1</span> 页
                         </span>
                         <button id="nextPageBtn" class="btn btn-sm btn-outline">
                             下一页 <i class="fas fa-chevron-right"></i>
@@ -136,7 +136,7 @@
                 </div>
             </div>
 
-            <!-- 右侧：文章详情 -->
+            <!-- 右侧文章详情 -->
             <div class="article-detail-section">
                 <h2><i class="fas fa-file-text"></i> 文章详情</h2>
                 
@@ -144,7 +144,7 @@
                 <div id="articlePrompt" class="article-prompt">
                     <i class="fas fa-hand-pointer"></i>
                     <h3>选择文章查看详情</h3>
-                    <p>在左侧搜索结果中点击文章标题，即可在此处查看完整的文章内容和分析结果</p>
+                    <p>在左侧搜索结果中点击文章标题即可在此处查看完整的文章内容和分析结果</p>
                 </div>
 
                 <!-- 文章详情内容 -->
@@ -171,19 +171,19 @@
                     <!-- 分析结果概览 -->
                     <div class="analysis-overview">
                         <div class="overview-item">
-                            <span class="label">情感等级：</span>
+                            <span class="label">情感等级</span>
                             <span id="articleSentiment" class="sentiment-badge"></span>
                         </div>
                         <div class="overview-item">
-                            <span class="label">风险标签：</span>
+                            <span class="label">风险标签</span>
                             <div id="articleTags" class="tags-container"></div>
                         </div>
                         <div class="overview-item">
-                            <span class="label">涉及企业：</span>
+                            <span class="label">涉及企业</span>
                             <div id="articleCompanies" class="companies-container"></div>
                         </div>
                         <div class="overview-item">
-                            <span class="label">重复度：</span>
+                            <span class="label">重复度</span>
                             <span id="articleDuplicateStatus"></span>
                         </div>
                     </div>
@@ -203,11 +203,11 @@
                             <h5><i class="fas fa-heart"></i> 情感分析</h5>
                             <div class="analysis-content">
                                 <div class="analysis-item">
-                                    <span class="label">情感等级：</span>
+                                    <span class="label">情感等级</span>
                                     <span id="detailSentimentLevel"></span>
                                 </div>
                                 <div class="analysis-item">
-                                    <span class="label">分析原因：</span>
+                                    <span class="label">分析原因</span>
                                     <div id="detailSentimentReason" class="reason-text"></div>
                                 </div>
                             </div>
@@ -234,15 +234,15 @@
                             <h5><i class="fas fa-fingerprint"></i> 重复度分析</h5>
                             <div class="analysis-content">
                                 <div class="analysis-item">
-                                    <span class="label">重复状态：</span>
+                                    <span class="label">重复状态</span>
                                     <span id="detailDuplicateStatus"></span>
                                 </div>
                                 <div class="analysis-item">
-                                    <span class="label">相似度：</span>
+                                    <span class="label">相似度</span>
                                     <span id="detailSimilarityScore"></span>
                                 </div>
                                 <div class="analysis-item">
-                                    <span class="label">重复组ID：</span>
+                                    <span class="label">重复组ID</span>
                                     <span id="detailDuplicateGroup"></span>
                                 </div>
                             </div>
@@ -281,7 +281,7 @@
             <div class="modal-body">
                 <div class="export-options">
                     <div class="export-format">
-                        <label>导出格式：</label>
+                        <label>导出格式</label>
                         <div class="format-options">
                             <label class="radio-item">
                                 <input type="radio" name="exportFormat" value="excel" checked>
@@ -301,17 +301,17 @@
                         </div>
                     </div>
                     <div class="export-content">
-                        <label>导出内容：</label>
+                        <label>导出内容</label>
                         <div class="content-options">
                             <label class="checkbox-item">
                                 <input type="checkbox" id="exportBasic" checked>
                                 <span class="checkmark"></span>
-                                基本信息（标题、发布时间、数据源）
+                                基本信息标题发布时间数据源
                             </label>
                             <label class="checkbox-item">
                                 <input type="checkbox" id="exportAnalysis" checked>
                                 <span class="checkmark"></span>
-                                分析结果（情感、标签、企业）
+                                分析结果情感标签企业
                             </label>
                             <label class="checkbox-item">
                                 <input type="checkbox" id="exportContent" checked>

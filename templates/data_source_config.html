@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据源配置 - 舆情分析系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .data-source-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .source-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .tab-button {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-button.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .config-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .config-section h3 {
+            margin: 0 0 16px 0;
+            color: #1f2937;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        
+        .header-list {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+        }
+        
+        .header-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 6px;
+        }
+        
+        .header-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .add-header-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .remove-header-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .field-mapping {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 6px;
+        }
+        
+        .field-mapping select {
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-connected {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-disconnected {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        
+        .status-unknown {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .file-upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            background: #f9fafb;
+            transition: all 0.3s ease;
+        }
+        
+        .file-upload-area.dragover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        
+        .file-upload-area input[type="file"] {
+            display: none;
+        }
+        
+        .file-upload-area label {
+            cursor: pointer;
+            color: #3b82f6;
+            font-weight: 600;
+        }
+        
+        .file-info {
+            margin-top: 12px;
+            padding: 12px;
+            background: #f0f9ff;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .error-message {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+        
+        .success-message {
+            background: #f0fdf4;
+            color: #166534;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="data-source-container">
+        <header class="header">
+            <h1><i class="fas fa-database"></i> 数据源配置</h1>
+            <p>配置API数据源或上传数据文件</p>
+            <div class="header-actions">
+                <button id="backBtn" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> 返回主页
+                </button>
+            </div>
+        </header>
+
+        <!-- 数据源状态 -->
+        <div class="config-section">
+            <h3><i class="fas fa-info-circle"></i> 当前数据源状态</h3>
+            <div id="sourceStatus">
+                <div class="status-indicator status-unknown">
+                    <i class="fas fa-question-circle"></i>
+                    正在检查状态...
+                </div>
+            </div>
+        </div>
+
+        <!-- 数据源切换标签 -->
+        <div class="source-tabs">
+            <button class="tab-button active" data-tab="api">
+                <i class="fas fa-cloud"></i> API数据源
+            </button>
+            <button class="tab-button" data-tab="file">
+                <i class="fas fa-file-upload"></i> 文件上传
+            </button>
+        </div>
+
+        <!-- API数据源配置 -->
+        <div id="api-tab" class="tab-content active">
+            <div class="config-section">
+                <h3><i class="fas fa-link"></i> API连接配置</h3>
+                
+                <div class="form-group">
+                    <label for="apiUrl">API URL *</label>
+                    <input type="url" id="apiUrl" placeholder="请输入API的访问地址" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="authType">授权方式 *</label>
+                    <select id="authType">
+                        <option value="none">不需要授权</option>
+                        <option value="api_key">API Key</option>
+                        <option value="bearer">Bearer Token</option>
+                        <option value="oauth">OAuth 2.0</option>
+                    </select>
+                </div>
+
+                <div id="authConfig" style="display: none;">
+                    <div class="form-group">
+                        <label for="apiKey">API Key</label>
+                        <input type="password" id="apiKey" placeholder="请输入API Key">
+                    </div>
+                    <div class="form-group">
+                        <label for="apiKeyHeader">Header名称</label>
+                        <input type="text" id="apiKeyHeader" placeholder="X-API-Key" value="X-API-Key">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>HTTP Headers</label>
+                    <div class="header-list">
+                        <div class="header-item">
+                            <input type="text" placeholder="Header名称" class="header-key">
+                            <input type="text" placeholder="Header值" class="header-value">
+                            <button type="button" class="remove-header-btn">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="button" class="add-header-btn" id="addHeaderBtn">
+                        <i class="fas fa-plus"></i> 添加Header
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label for="timeout">请求超时秒</label>
+                    <input type="number" id="timeout" value="30" min="5" max="300">
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h3><i class="fas fa-map"></i> 字段映射配置</h3>
+                <p style="color: #6b7280; margin-bottom: 16px;">将API返回的字段映射到系统内部字段</p>
+                
+                <div id="fieldMappings">
+                    <div class="field-mapping">
+                        <label>内容字段</label>
+                        <select class="field-select" data-system-field="content">
+                            <option value="">请选择API字段</option>
+                        </select>
+                    </div>
+                    <div class="field-mapping">
+                        <label>标题字段</label>
+                        <select class="field-select" data-system-field="title">
+                            <option value="">请选择API字段</option>
+                        </select>
+                    </div>
+                    <div class="field-mapping">
+                        <label>发布时间字段</label>
+                        <select class="field-select" data-system-field="publish_time">
+                            <option value="">请选择API字段</option>
+                        </select>
+                    </div>
+                    <div class="field-mapping">
+                        <label>来源字段</label>
+                        <select class="field-select" data-system-field="source">
+                            <option value="">请选择API字段</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h3><i class="fas fa-cogs"></i> 查询参数配置</h3>
+                
+                <div class="form-group">
+                    <label for="timeField">时间字段名</label>
+                    <input type="text" id="timeField" value="publish_time" placeholder="API中的时间字段名">
+                </div>
+
+                <div class="form-group">
+                    <label for="pageParam">分页参数名</label>
+                    <div class="form-row">
+                        <input type="text" id="pageParam" value="page" placeholder="页码参数名">
+                        <input type="text" id="sizeParam" value="page_size" placeholder="每页大小参数名">
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="testApiBtn" class="btn btn-secondary">
+                    <i class="fas fa-flask"></i> 测试连接
+                </button>
+                <button id="saveApiConfigBtn" class="btn btn-primary">
+                    <i class="fas fa-save"></i> 保存配置
+                </button>
+            </div>
+        </div>
+
+        <!-- 文件上传配置 -->
+        <div id="file-tab" class="tab-content">
+            <div class="config-section">
+                <h3><i class="fas fa-file-upload"></i> 文件上传</h3>
+                
+                <div class="file-upload-area" id="fileUploadArea">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: #9ca3af; margin-bottom: 16px;"></i>
+                    <p>拖拽文件到此处或 <label for="fileInput" style="color: #3b82f6; cursor: pointer;">点击选择文件</label></p>
+                    <p style="color: #6b7280; font-size: 14px; margin-top: 8px;">支持 CSVJSON 格式文件大小不超过 10MB</p>
+                    <input type="file" id="fileInput" accept=".csv,.json">
+                </div>
+
+                <div id="fileInfo" class="file-info" style="display: none;">
+                    <div id="fileDetails"></div>
+                </div>
+
+                <div class="form-group" style="margin-top: 20px;">
+                    <label for="fileEncoding">文件编码</label>
+                    <select id="fileEncoding">
+                        <option value="utf-8">UTF-8</option>
+                        <option value="gbk">GBK</option>
+                        <option value="gb2312">GB2312</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h3><i class="fas fa-map"></i> 字段映射配置</h3>
+                <p style="color: #6b7280; margin-bottom: 16px;">将文件中的字段映射到系统内部字段</p>
+                
+                <div id="fileFieldMappings">
+                    <div class="field-mapping">
+                        <label>内容字段</label>
+                        <select class="file-field-select" data-system-field="content">
+                            <option value="">请选择文件字段</option>
+                        </select>
+                    </div>
+                    <div class="field-mapping">
+                        <label>标题字段</label>
+                        <select class="file-field-select" data-system-field="title">
+                            <option value="">请选择文件字段</option>
+                        </select>
+                    </div>
+                    <div class="field-mapping">
+                        <label>发布时间字段</label>
+                        <select class="file-field-select" data-system-field="publish_time">
+                            <option value="">请选择文件字段</option>
+                        </select>
+                    </div>
+                    <div class="field-mapping">
+                        <label>来源字段</label>
+                        <select class="file-field-select" data-system-field="source">
+                            <option value="">请选择文件字段</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="uploadFileBtn" class="btn btn-primary" disabled>
+                    <i class="fas fa-upload"></i> 上传文件
+                </button>
+                <button id="clearFileBtn" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> 清除文件
+                </button>
+            </div>
+        </div>
+
+        <!-- 数据源切换 -->
+        <div class="config-section">
+            <h3><i class="fas fa-exchange-alt"></i> 数据源切换</h3>
+            <p style="color: #6b7280; margin-bottom: 16px;">在API数据源和文件上传之间切换</p>
+            
+            <div class="action-buttons">
+                <button id="switchToApiBtn" class="btn btn-primary">
+                    <i class="fas fa-cloud"></i> 切换到API数据源
+                </button>
+                <button id="switchToFileBtn" class="btn btn-secondary">
+                    <i class="fas fa-file"></i> 切换到文件数据源
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class DataSourceConfig {
+            constructor() {
+                this.currentTab = 'api';
+                this.currentFile = null;
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.loadCurrentStatus();
+            }
+
+            bindEvents() {
+                // 标签切换
+                document.querySelectorAll('.tab-button').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.switchTab(e.target.dataset.tab);
+                    });
+                });
+
+                // 授权方式切换
+                document.getElementById('authType').addEventListener('change', (e) => {
+                    this.toggleAuthConfig(e.target.value);
+                });
+
+                // Header管理
+                document.getElementById('addHeaderBtn').addEventListener('click', () => {
+                    this.addHeaderRow();
+                });
+
+                // 文件上传
+                const fileInput = document.getElementById('fileInput');
+                const fileUploadArea = document.getElementById('fileUploadArea');
+
+                fileInput.addEventListener('change', (e) => {
+                    this.handleFileSelect(e.target.files[0]);
+                });
+
+                fileUploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    fileUploadArea.classList.add('dragover');
+                });
+
+                fileUploadArea.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    fileUploadArea.classList.remove('dragover');
+                });
+
+                fileUploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    fileUploadArea.classList.remove('dragover');
+                    this.handleFileSelect(e.dataTransfer.files[0]);
+                });
+
+                // 按钮事件
+                document.getElementById('testApiBtn').addEventListener('click', () => {
+                    this.testApiConnection();
+                });
+
+                document.getElementById('saveApiConfigBtn').addEventListener('click', () => {
+                    this.saveApiConfig();
+                });
+
+                document.getElementById('uploadFileBtn').addEventListener('click', () => {
+                    this.uploadFile();
+                });
+
+                document.getElementById('clearFileBtn').addEventListener('click', () => {
+                    this.clearFile();
+                });
+
+                document.getElementById('switchToApiBtn').addEventListener('click', () => {
+                    this.switchDataSource('api');
+                });
+
+                document.getElementById('switchToFileBtn').addEventListener('click', () => {
+                    this.switchDataSource('file');
+                });
+
+                document.getElementById('backBtn').addEventListener('click', () => {
+                    window.location.href = '/';
+                });
+            }
+
+            switchTab(tabName) {
+                // 更新标签按钮状态
+                document.querySelectorAll('.tab-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector([data-tab=""]).classList.add('active');
+
+                // 更新标签内容
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(${tabName}-tab).classList.add('active');
+
+                this.currentTab = tabName;
+            }
+
+            toggleAuthConfig(authType) {
+                const authConfig = document.getElementById('authConfig');
+                if (authType === 'api_key') {
+                    authConfig.style.display = 'block';
+                } else {
+                    authConfig.style.display = 'none';
+                }
+            }
+
+            addHeaderRow() {
+                const headerList = document.querySelector('.header-list');
+                const newRow = document.createElement('div');
+                newRow.className = 'header-item';
+                newRow.innerHTML = 
+                    <input type="text" placeholder="Header名称" class="header-key">
+                    <input type="text" placeholder="Header值" class="header-value">
+                    <button type="button" class="remove-header-btn">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                ;
+                headerList.appendChild(newRow);
+
+                // 绑定删除事件
+                newRow.querySelector('.remove-header-btn').addEventListener('click', () => {
+                    newRow.remove();
+                });
+            }
+
+            handleFileSelect(file) {
+                if (!file) return;
+
+                // 检查文件类型
+                const allowedTypes = ['text/csv', 'application/json'];
+                const fileExtension = file.name.split('.').pop().toLowerCase();
+                
+                if (!['csv', 'json'].includes(fileExtension)) {
+                    this.showError('只支持CSV和JSON文件');
+                    return;
+                }
+
+                // 检查文件大小10MB
+                if (file.size > 10 * 1024 * 1024) {
+                    this.showError('文件大小不能超过10MB');
+                    return;
+                }
+
+                this.currentFile = file;
+                this.displayFileInfo(file);
+                this.populateFileFields(file);
+                document.getElementById('uploadFileBtn').disabled = false;
+            }
+
+            displayFileInfo(file) {
+                const fileInfo = document.getElementById('fileInfo');
+                const fileDetails = document.getElementById('fileDetails');
+                
+                fileDetails.innerHTML = 
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <i class="fas fa-file" style="color: #3b82f6;"></i>
+                        <div>
+                            <div style="font-weight: 600;"></div>
+                            <div style="color: #6b7280; font-size: 12px;">
+                                大小:  MB
+                            </div>
+                        </div>
+                    </div>
+                ;
+                
+                fileInfo.style.display = 'block';
+            }
+
+            async populateFileFields(file) {
+                try {
+                    const text = await file.text();
+                    let fields = [];
+
+                    if (file.name.endsWith('.csv')) {
+                        const lines = text.split('\n');
+                        if (lines.length > 0) {
+                            fields = lines[0].split(',').map(field => field.trim().replace(/"/g, ''));
+                        }
+                    } else if (file.name.endsWith('.json')) {
+                        const data = JSON.parse(text);
+                        if (Array.isArray(data) && data.length > 0) {
+                            fields = Object.keys(data[0]);
+                        } else if (typeof data === 'object') {
+                            fields = Object.keys(data);
+                        }
+                    }
+
+                    // 更新字段选择器
+                    document.querySelectorAll('.file-field-select').forEach(select => {
+                        const currentValue = select.value;
+                        select.innerHTML = '<option value="">请选择文件字段</option>';
+                        
+                        fields.forEach(field => {
+                            const option = document.createElement('option');
+                            option.value = field;
+                            option.textContent = field;
+                            select.appendChild(option);
+                        });
+                        
+                        select.value = currentValue;
+                    });
+                } catch (error) {
+                    console.error('解析文件字段失败:', error);
+                }
+            }
+
+            async loadCurrentStatus() {
+                try {
+                    const response = await fetch('/api/data-source/status');
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.updateStatusDisplay(result.data);
+                    }
+                } catch (error) {
+                    console.error('获取状态失败:', error);
+                    this.updateStatusDisplay({ source_type: 'none', status: 'not_configured' });
+                }
+            }
+
+            updateStatusDisplay(status) {
+                const statusElement = document.getElementById('sourceStatus');
+                let statusHtml = '';
+
+                if (status.status === 'configured') {
+                    statusHtml = 
+                        <div class="status-indicator status-connected">
+                            <i class="fas fa-check-circle"></i>
+                            已连接 - 
+                        </div>
+                    ;
+                } else {
+                    statusHtml = 
+                        <div class="status-indicator status-disconnected">
+                            <i class="fas fa-exclamation-circle"></i>
+                            未配置数据源
+                        </div>
+                    ;
+                }
+
+                statusElement.innerHTML = statusHtml;
+            }
+
+            async testApiConnection() {
+                const config = this.getApiConfig();
+                if (!config.url) {
+                    this.showError('请先输入API URL');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/data-source/api/test', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(config)
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.showSuccess('API连接测试成功');
+                        this.populateApiFields(result.sample_data);
+                    } else {
+                        this.showError(连接测试失败: );
+                    }
+                } catch (error) {
+                    this.showError(连接测试失败: );
+                }
+            }
+
+            populateApiFields(sampleData) {
+                if (!sampleData || sampleData.length === 0) return;
+
+                const sampleItem = sampleData[0];
+                const fields = Object.keys(sampleItem);
+
+                // 更新字段选择器
+                document.querySelectorAll('.field-select').forEach(select => {
+                    const currentValue = select.value;
+                    select.innerHTML = '<option value="">请选择API字段</option>';
+                    
+                    fields.forEach(field => {
+                        const option = document.createElement('option');
+                        option.value = field;
+                        option.textContent = field;
+                        select.appendChild(option);
+                    });
+                    
+                    select.value = currentValue;
+                });
+            }
+
+            getApiConfig() {
+                const headers = {};
+                document.querySelectorAll('.header-item').forEach(item => {
+                    const key = item.querySelector('.header-key').value.trim();
+                    const value = item.querySelector('.header-value').value.trim();
+                    if (key && value) {
+                        headers[key] = value;
+                    }
+                });
+
+                const fieldMapping = {};
+                document.querySelectorAll('.field-select').forEach(select => {
+                    const systemField = select.dataset.systemField;
+                    const apiField = select.value;
+                    if (apiField) {
+                        fieldMapping[systemField] = apiField;
+                    }
+                });
+
+                const config = {
+                    url: document.getElementById('apiUrl').value,
+                    headers: headers,
+                    auth_type: document.getElementById('authType').value,
+                    field_mapping: fieldMapping,
+                    timeout: parseInt(document.getElementById('timeout').value)
+                };
+
+                if (config.auth_type === 'api_key') {
+                    config.auth_config = {
+                        api_key: document.getElementById('apiKey').value,
+                        header_name: document.getElementById('apiKeyHeader').value
+                    };
+                }
+
+                config.query_params = {
+                    time_field: document.getElementById('timeField').value
+                };
+
+                config.pagination_config = {
+                    page_param: document.getElementById('pageParam').value,
+                    size_param: document.getElementById('sizeParam').value
+                };
+
+                return config;
+            }
+
+            async saveApiConfig() {
+                const config = this.getApiConfig();
+                
+                if (!config.url) {
+                    this.showError('请先输入API URL');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/data-source/api/configure', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(config)
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.showSuccess('API配置保存成功');
+                        this.loadCurrentStatus();
+                    } else {
+                        this.showError(配置保存失败: );
+                    }
+                } catch (error) {
+                    this.showError(配置保存失败: );
+                }
+            }
+
+            async uploadFile() {
+                if (!this.currentFile) {
+                    this.showError('请先选择文件');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('file', this.currentFile);
+                formData.append('encoding', document.getElementById('fileEncoding').value);
+
+                const fieldMapping = {};
+                document.querySelectorAll('.file-field-select').forEach(select => {
+                    const systemField = select.dataset.systemField;
+                    const fileField = select.value;
+                    if (fileField) {
+                        fieldMapping[systemField] = fileField;
+                    }
+                });
+
+                formData.append('field_mapping', JSON.stringify(fieldMapping));
+
+                try {
+                    const response = await fetch('/api/data-source/file/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.showSuccess(文件上传成功共加载  条数据);
+                        this.loadCurrentStatus();
+                    } else {
+                        this.showError(文件上传失败: );
+                    }
+                } catch (error) {
+                    this.showError(文件上传失败: );
+                }
+            }
+
+            async clearFile() {
+                try {
+                    const response = await fetch('/api/data-source/file/clear', {
+                        method: 'DELETE'
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.showSuccess('文件数据已清除');
+                        this.currentFile = null;
+                        document.getElementById('fileInfo').style.display = 'none';
+                        document.getElementById('uploadFileBtn').disabled = true;
+                        this.loadCurrentStatus();
+                    }
+                } catch (error) {
+                    this.showError(清除文件失败: );
+                }
+            }
+
+            async switchDataSource(sourceType) {
+                try {
+                    const response = await fetch('/api/data-source/switch', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ source_type: sourceType })
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.showSuccess(result.message);
+                        this.loadCurrentStatus();
+                    } else {
+                        this.showError(切换失败: );
+                    }
+                } catch (error) {
+                    this.showError(切换失败: );
+                }
+            }
+
+            showError(message) {
+                this.showMessage(message, 'error');
+            }
+
+            showSuccess(message) {
+                this.showMessage(message, 'success');
+            }
+
+            showMessage(message, type) {
+                // 移除现有消息
+                const existingMessage = document.querySelector('.error-message, .success-message');
+                if (existingMessage) {
+                    existingMessage.remove();
+                }
+
+                const messageDiv = document.createElement('div');
+                messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
+                messageDiv.textContent = message;
+
+                document.querySelector('.data-source-container').insertBefore(
+                    messageDiv, 
+                    document.querySelector('.source-tabs')
+                );
+
+                // 3秒后自动移除
+                setTimeout(() => {
+                    if (messageDiv.parentNode) {
+                        messageDiv.remove();
+                    }
+                }, 3000);
+            }
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            new DataSourceConfig();
+        });
+    </script>
+</body>
+</html>

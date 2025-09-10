@@ -29,17 +29,13 @@ from data_api import router as data_router
 from results_api import router as results_router
 from api_config_routes import router as api_config_router
 from chat_api import router as chat_router
-
-from unified_data_source_manager import UnifiedDataSourceManager, QueryParams
-from data_source_config_api import router as data_source_config_router, get_data_source_manager
-from test_database_api import router as test_database_router
 import asyncio
 import json
 import logging
 
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="多Agent情感分析系统", description="专门处理企业识别标签分类和情感等级分类")
+app = FastAPI(title="多Agent情感分析系统", description="专门处理企业识别、标签分类和情感等级分类")
 
 # 初始化各个agent
 company_agent = CompanyAgent()  # 企业识别模块
@@ -50,7 +46,7 @@ sentiment_agent = SentimentAgent()
 # 设置模板和静态文件
 templates = Jinja2Templates(directory="templates")
 
-# 自定义静态文件处理添加防缓存头部
+# 自定义静态文件处理，添加防缓存头部
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import os
@@ -76,8 +72,6 @@ app.include_router(data_router, prefix="/api/data")
 app.include_router(results_router, prefix="/api/results")
 app.include_router(api_config_router)
 app.include_router(chat_router)
-app.include_router(data_source_config_router)
-app.include_router(test_database_router)
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
@@ -88,17 +82,12 @@ async def root(request: Request):
     response.headers["Expires"] = "0"
     return response
 
-@app.get("/data-source-config", response_class=HTMLResponse)
-async def data_source_config_page(request: Request):
-    """数据源配置页面"""
-    return templates.TemplateResponse("data_source_config.html", {"request": request})
-
 @app.get("/parsing", response_class=HTMLResponse)
 async def parsing_tasks_page(request: Request):
     """执行解析任务页面"""
     return templates.TemplateResponse("parsing_tasks.html", {"request": request})
 
-# 移除 /results 路由主页直接显示分析结果
+# 移除 /results 路由，主页直接显示分析结果
 
 @app.get("/config", response_class=HTMLResponse)
 async def config_page(request: Request):
@@ -151,7 +140,7 @@ async def analyze_text(request: AnalysisRequest):
             async def company_analysis():
                 yield f"data: {json.dumps({'type': 'progress', 'step': 'companies', 'message': '正在识别企业信息...'})}\n\n"
                 results = await company_agent.analyze_companies(request.content)
-                # 现在企业识别只返回企业名称转换为兼容格式
+                # 现在企业识别只返回企业名称，转换为兼容格式
                 company_data = [{"name": c.name, "credit_code": "", "reason": f"LLM智能识别: {c.name}"} for c in results]
                 yield f"data: {json.dumps({'type': 'result', 'step': 'companies', 'data': company_data})}\n\n"
 
@@ -170,7 +159,7 @@ async def analyze_text(request: AnalysisRequest):
 
             
             # 完成分析
-            yield f"data: {json.dumps({'type': 'complete', 'message': '分析完成'})}\n\n"
+            yield f"data: {json.dumps({'type': 'complete', 'message': '分析完成！'})}\n\n"
         
         return StreamingResponse(
             generate_stream(),
@@ -256,7 +245,7 @@ async def batch_parse_data(request: Request):
         body = await request.json()
         data_source = body.get("data_source", "舆情数据")
         data_range = body.get("data_range", "all")
-        # 兼容两种参数名称优先使用 start_time/end_time回退到 start_date/end_date
+        # 兼容两种参数名称：优先使用 start_time/end_time，回退到 start_date/end_date
         start_date = body.get("start_time") or body.get("start_date")
         end_date = body.get("end_time") or body.get("end_date")
         
@@ -286,7 +275,7 @@ async def batch_parse_data(request: Request):
                 from text_deduplicator import DuplicateDetectionManager
                 duplicate_manager = DuplicateDetectionManager({
                     'similarity_threshold': 0.6,  # 降低阈值以捕获更多相似文本
-                    'hamming_threshold': 25        # 基于测试结果汉明距离25可以捕获相似文本
+                    'hamming_threshold': 25        # 基于测试结果，汉明距离25可以捕获相似文本
                 })
                 
                 yield f"data: {json.dumps({'type': 'log', 'message': '初始化SimHash重复检测系统...'})}\n\n"
@@ -298,7 +287,7 @@ async def batch_parse_data(request: Request):
                 filters = {}
                 if start_date and end_date:
                     # 使用与筛选数据量相同的时间范围处理方式
-                    # 确保时间格式统一精确到分钟
+                    # 确保时间格式统一，精确到分钟
                     filters["publish_time"] = {
                         "start": start_date,
                         "end": end_date
@@ -307,7 +296,7 @@ async def batch_parse_data(request: Request):
                     # 记录时间范围信息
                     yield f"data: {json.dumps({'type': 'log', 'message': f'查询时间范围: {start_date} 至 {end_date}'})}\n\n"
                 else:
-                    yield f"data: {json.dumps({'type': 'log', 'message': '未指定时间范围将查询所有数据'})}\n\n"
+                    yield f"data: {json.dumps({'type': 'log', 'message': '未指定时间范围，将查询所有数据'})}\n\n"
                 
                 # 先获取数据总量 - 使用与筛选数据量相同的查询方式
                 count_result = sentiment_db.get_data_count(filters=filters)
@@ -325,7 +314,7 @@ async def batch_parse_data(request: Request):
                 
                 yield f"data: {json.dumps({'type': 'log', 'message': f'找到 {total_available} 条数据需要分析'})}\n\n"
                 
-                # 查询所有符合条件的数据不设置数量限制
+                # 查询所有符合条件的数据（不设置数量限制）
                 data_result = sentiment_db.get_data(
                     fields=["*"],
                     filters=filters,
@@ -360,7 +349,7 @@ async def batch_parse_data(request: Request):
                         # 提取文本内容
                         content_text = data_item.get('content', '') or data_item.get('title', '')
                         if not content_text:
-                            yield f"data: {json.dumps({'type': 'log', 'message': f'第 {processed} 条数据内容为空跳过'})}\n\n"
+                            yield f"data: {json.dumps({'type': 'log', 'message': f'第 {processed} 条数据内容为空，跳过'})}\n\n"
                             failed_count += 1
                             continue
                         
@@ -414,7 +403,7 @@ async def batch_parse_data(request: Request):
                             yield f"data: {json.dumps({'type': 'log', 'message': f'第 {processed} 条数据摘要生成完成'})}\n\n"
                         except Exception as e:
                             summary = content_text[:200] + "..." if len(content_text) > 200 else content_text
-                            yield f"data: {json.dumps({'type': 'warning', 'message': f'第 {processed} 条数据摘要生成失败使用截取摘要: {str(e)}'})}\n\n"
+                            yield f"data: {json.dumps({'type': 'warning', 'message': f'第 {processed} 条数据摘要生成失败，使用截取摘要: {str(e)}'})}\n\n"
                         
                         # 准备数据用于重复检测
                         data_for_duplicate = {
@@ -425,7 +414,7 @@ async def batch_parse_data(request: Request):
                         }
                         all_data_items.append(data_for_duplicate)
                         
-                        # 暂时存储分析结果等待重复检测
+                        # 暂时存储分析结果，等待重复检测
                         temp_save_data = {
                             'original_id': original_id,
                             'title': data_item.get('title', '无标题'),
@@ -436,14 +425,14 @@ async def batch_parse_data(request: Request):
                             'sentiment_level': sentiment_result.level if sentiment_result else '未知',
                             'sentiment_reason': sentiment_result.reason if sentiment_result else '无原因',
                             'companies': ','.join([company.name for company in company_results]) if company_results else '',
-                            'processing_time': round(time.time() - processing_start_time, 2),  # 处理时间秒
+                            'processing_time': round(time.time() - processing_start_time, 2),  # 处理时间（秒）
                             'tag_results': tag_results_dict
                         }
                         
                         # 将分析结果与数据项关联
                         data_for_duplicate['analysis_result'] = temp_save_data
                         
-                        yield f"data: {json.dumps({'type': 'log', 'message': f'第 {processed} 条数据分析完成等待重复检测...'})}\n\n"
+                        yield f"data: {json.dumps({'type': 'log', 'message': f'第 {processed} 条数据分析完成，等待重复检测...'})}\n\n"
                         
                     except Exception as e:
                         failed_count += 1
@@ -452,13 +441,13 @@ async def batch_parse_data(request: Request):
                 
                 # 执行批量重复检测
                 if all_data_items:
-                    yield f"data: {json.dumps({'type': 'log', 'message': f'开始执行SimHash重复检测共 {len(all_data_items)} 条数据...'})}\n\n"
+                    yield f"data: {json.dumps({'type': 'log', 'message': f'开始执行SimHash重复检测，共 {len(all_data_items)} 条数据...'})}\n\n"
                     
                     try:
                         # 执行重复检测
                         duplicated_results = duplicate_manager.detect_duplicates(all_data_items)
                         
-                        yield f"data: {json.dumps({'type': 'log', 'message': '重复检测完成开始保存到数据库...'})}\n\n"
+                        yield f"data: {json.dumps({'type': 'log', 'message': '重复检测完成，开始保存到数据库...'})}\n\n"
                         
                         # 保存带有重复检测结果的数据
                         for result_item in duplicated_results:
@@ -479,9 +468,9 @@ async def batch_parse_data(request: Request):
                                 if save_result['success']:
                                     success_count += 1
                                 elif save_result.get('duplicate', False):
-                                    # 跳过重复记录不算作失败
+                                    # 跳过重复记录，不算作失败
                                     item_id = result_item['id']
-                                    yield f"data: {json.dumps({'type': 'log', 'message': f'ID {item_id} 已存在跳过重复保存'})}\n\n"
+                                    yield f"data: {json.dumps({'type': 'log', 'message': f'ID {item_id} 已存在，跳过重复保存'})}\n\n"
                                 else:
                                     save_error = save_result.get('message', '未知错误')
                                     failed_count += 1
@@ -495,13 +484,13 @@ async def batch_parse_data(request: Request):
                         
                         # 输出重复检测统计
                         duplicate_count = sum(1 for item in duplicated_results if item['is_duplicate'])
-                        yield f"data: {json.dumps({'type': 'log', 'message': f'重复检测完成发现 {duplicate_count} 条重复文本'})}\n\n"
+                        yield f"data: {json.dumps({'type': 'log', 'message': f'重复检测完成！发现 {duplicate_count} 条重复文本'})}\n\n"
                         
                     except Exception as e:
                         yield f"data: {json.dumps({'type': 'error', 'message': f'重复检测失败: {str(e)}'})}\n\n"
                 
                 # 完成
-                completion_msg = f'批量解析完成总处理: {processed}, 成功: {success_count}, 失败: {failed_count}'
+                completion_msg = f'批量解析完成！总处理: {processed}, 成功: {success_count}, 失败: {failed_count}'
                 yield f"data: {json.dumps({'type': 'complete', 'total_processed': processed, 'success_count': success_count, 'failed_count': failed_count, 'session_id': session_id, 'message': completion_msg})}\n\n"
                 
                 # 自动触发去重和导出流程
@@ -518,7 +507,7 @@ async def batch_parse_data(request: Request):
                         
                         if dedup_result['success']:
                             duplicates_removed = dedup_result['duplicates_removed']
-                            yield f"data: {json.dumps({'type': 'log', 'message': f'去重完成删除重复记录: {duplicates_removed}'})}\n\n"
+                            yield f"data: {json.dumps({'type': 'log', 'message': f'去重完成！删除重复记录: {duplicates_removed}'})}\n\n"
                             
                             # 执行自动导出
                             yield f"data: {json.dumps({'type': 'log', 'message': '正在执行自动导出...'})}\n\n"
@@ -528,7 +517,7 @@ async def batch_parse_data(request: Request):
                             
                             if export_result['success']:
                                 export_file = export_result['export_file']
-                                yield f"data: {json.dumps({'type': 'log', 'message': f'自动导出完成文件: {export_file}'})}\n\n"
+                                yield f"data: {json.dumps({'type': 'log', 'message': f'自动导出完成！文件: {export_file}'})}\n\n"
                             else:
                                 export_error = export_result['message']
                                 yield f"data: {json.dumps({'type': 'warning', 'message': f'自动导出失败: {export_error}'})}\n\n"
@@ -573,7 +562,7 @@ async def get_analysis_results(
         # 直接使用结果数据库 - 修复数据库路径
         result_db = ResultDatabase('data/analysis_results.db')
         
-        # 获取分析结果支持搜索
+        # 获取分析结果，支持搜索
         result = result_db.get_analysis_results(
             page=page, 
             page_size=page_size,
@@ -583,7 +572,7 @@ async def get_analysis_results(
         logger.info(f"数据库查询结果 - success: {result.get('success')}, total: {result.get('total')}")
         
         if result['success']:
-            # ResultDatabase已经返回了正确格式的数据直接返回
+            # ResultDatabase已经返回了正确格式的数据，直接返回
             # 确保返回JSONResponse以正确设置Content-Type和编码
             from fastapi.responses import JSONResponse
             return JSONResponse(
@@ -629,7 +618,7 @@ async def get_duplicate_statistics():
 async def enhanced_export(
     export_format: str = Form("json", description="导出格式 (json/csv/excel)"),
     include_metadata: bool = Form(True, description="是否包含元数据"),
-    filter_tags: Optional[str] = Form(None, description="过滤标签逗号分隔")
+    filter_tags: Optional[str] = Form(None, description="过滤标签，逗号分隔")
 ):
     """增强数据导出接口"""
     try:
@@ -664,7 +653,7 @@ async def enhanced_export(
 
 @app.get("/api/config")
 async def get_config():
-    """获取当前配置仅返回非敏感项和API Key掩码"""
+    """获取当前配置（仅返回非敏感项和API Key掩码）"""
     masked_key = None
     api_key = Config.get_ali_api_key()
     if api_key:
@@ -685,7 +674,7 @@ async def get_config():
 
 @app.post("/api/config")
 async def update_config(payload: dict):
-    """更新运行时配置进程内仅当次生效建议持久化到.env手动管理"""
+    """更新运行时配置（进程内，仅当次生效）。建议持久化到.env手动管理。"""
     # 允许更新的字段
     updatable_fields = {
         "ALI_API_KEY": str,
@@ -736,51 +725,51 @@ async def update_config(payload: dict):
         except Exception as e:
             return JSONResponse(status_code=400, content={"detail": f"AGENT_PROMPTS更新失败: {e}"})
 
-    # 同步到相关运行实例例如AliLLMClient此处仅在下次实例化生效
-    # 如需立刻生效可考虑重新创建相关客户端实例
-    return {"message": "配置已更新进程内", "updated": updated}
+    # 同步到相关运行实例（例如AliLLMClient），此处仅在下次实例化生效；
+    # 如需立刻生效，可考虑重新创建相关客户端实例。
+    return {"message": "配置已更新（进程内）", "updated": updated}
 
 
 def setup_api_key():
     """在启动时要求用户输入API密钥"""
     print("=" * 60)
-    print(" 舆情分析系统启动")
+    print("🚀 舆情分析系统启动")
     print("=" * 60)
     
-    # 每次启动都要求输入API密钥根据用户需求
-    print("\n 请输入阿里云API密钥以启用智能分析功能")
-    print(" 您可以在阿里云控制台获取API密钥")
-    print(" 获取地址: https://dashscope.console.aliyun.com/")
+    # 每次启动都要求输入API密钥（根据用户需求）
+    print("\n🔑 请输入阿里云API密钥以启用智能分析功能")
+    print("💡 您可以在阿里云控制台获取API密钥")
+    print("🔗 获取地址: https://dashscope.console.aliyun.com/")
     
     while True:
         try:
             api_key = getpass.getpass("\n请输入您的阿里云API密钥: ").strip()
             
             if not api_key:
-                print(" API密钥不能为空请重新输入")
+                print("❌ API密钥不能为空，请重新输入")
                 continue
                 
             # 验证API密钥格式
             is_valid, message = api_key_manager.validate_api_key(api_key)
             if not is_valid:
-                print(f" {message}")
+                print(f"❌ {message}")
                 continue
             
-            # 保存API密钥到内存中的Config不持久化存储
+            # 保存API密钥到内存中的Config（不持久化存储）
             Config._ali_api_key = api_key
             
-            print(" API密钥配置成功")
-            print(" 注意API密钥仅在本次会话中有效重启后需要重新输入")
+            print("✅ API密钥配置成功！")
+            print("💡 注意：API密钥仅在本次会话中有效，重启后需要重新输入")
             break
             
         except KeyboardInterrupt:
-            print("\n\n 用户取消启动")
+            print("\n\n👋 用户取消启动")
             exit(0)
         except Exception as e:
-            print(f" 配置API密钥时出错: {e}")
+            print(f"❌ 配置API密钥时出错: {e}")
             continue
     
-    print("\n 系统配置完成正在启动服务...")
+    print("\n🎉 系统配置完成，正在启动服务...")
     print("=" * 60)
 
 
@@ -788,10 +777,10 @@ if __name__ == "__main__":
     # 启动时配置API密钥
     setup_api_key()
     
-    print(" 服务启动中...")
-    print(" 访问地址: http://localhost:8000")
-    print(" 管理界面: http://localhost:8000/config")
-    print(" 智能聊天: 点击右下角聊天图标")
+    print("🌐 服务启动中...")
+    print("📍 访问地址: http://localhost:8000")
+    print("📊 管理界面: http://localhost:8000/config")
+    print("💬 智能聊天: 点击右下角聊天图标")
     print("\n按 Ctrl+C 停止服务")
     print("=" * 60)
     

@@ -1,0 +1,321 @@
+﻿# 在main.py的导入部分添加新的导入
+from unified_data_source_manager import UnifiedDataSourceManager, QueryParams
+from data_source_config_api import router as data_source_config_router, get_data_source_manager
+
+# 在路由集成部分添加新的路由
+app.include_router(data_source_config_router)
+
+# 添加新的批量解析接口
+@app.post("/api/batch_parse_v2")
+async def batch_parse_data_v2(request: Request):
+    \"\"\"批量解析数据接口 - 使用统一数据源管理器\"\"\"
+    try:
+        from result_database_new import ResultDatabase
+        
+        body = await request.json()
+        data_source = body.get("data_source", "舆情数据")
+        data_range = body.get("data_range", "all")
+        # 兼容两种参数名称：优先使用 start_time/end_time，回退到 start_date/end_date
+        start_date = body.get("start_time") or body.get("start_date")
+        end_date = body.get("end_time") or body.get("end_date")
+        
+        enable_sentiment = body.get("enable_sentiment", True)
+        enable_tags = body.get("enable_tags", True)
+        enable_companies = body.get("enable_companies", True)
+        
+        # 生成唯一的会话ID
+        import uuid
+        session_id = str(uuid.uuid4())
+        
+        # 创建流式响应
+        async def generate_stream():
+            # 调试信息
+            start_time_param = body.get("start_time")
+            end_time_param = body.get("end_time")
+            yield f"data: {json.dumps({'type': 'log', 'message': f'接收到的参数: start_time={start_time_param}, end_time={end_time_param}'})}\n\n"
+            yield f"data: {json.dumps({'type': 'log', 'message': f'解析后的时间: start_date={start_date}, end_date={end_date}'})}\n\n"
+            try:
+                yield f"data: {json.dumps({'type': 'start', 'message': f'开始批量解析 {data_source} 数据...'})}\n\n"
+                
+                # 获取统一数据源管理器
+                data_source_manager = get_data_source_manager()
+                result_db = ResultDatabase('data/analysis_results.db')
+                
+                # 检查数据源状态
+                source_info = data_source_manager.get_current_source_info()
+                if source_info['status'] != 'configured':
+                    yield f"data: {json.dumps({'type': 'error', 'message': '数据源未配置，请先配置API数据源或上传数据文件'})}\n\n"
+                    return
+                
+                yield f"data: {json.dumps({'type': 'log', 'message': f'当前数据源: {source_info[\"source_type\"]}'})}\n\n"
+                
+                # 初始化重复检测管理器
+                from text_deduplicator import DuplicateDetectionManager
+                duplicate_manager = DuplicateDetectionManager({
+                    'similarity_threshold': 0.6,  # 降低阈值以捕获更多相似文本
+                    'hamming_threshold': 25        # 基于测试结果，汉明距离25可以捕获相似文本
+                })
+                
+                yield f"data: {json.dumps({'type': 'log', 'message': '初始化SimHash重复检测系统...'})}\n\n"
+                
+                # 构建查询参数
+                query_params = QueryParams(
+                    time_field="publish_time",
+                    start_time=start_date,
+                    end_time=end_date,
+                    page=1,
+                    page_size=1000  # 初始查询获取数据量
+                )
+                
+                # 先获取数据总量
+                count_result = await data_source_manager.get_data_count(
+                    filters={"publish_time": {"start": start_date, "end": end_date}} if start_date and end_date else None
+                )
+                
+                if not count_result['success']:
+                    error_msg = count_result.get('error', '未知错误')
+                    yield f"data: {json.dumps({'type': 'error', 'message': f'获取数据量失败: {error_msg}'})}\n\n"
+                    return
+                
+                total_available = count_result['total']
+                
+                if total_available == 0:
+                    yield f"data: {json.dumps({'type': 'complete', 'total_processed': 0, 'message': '没有找到需要分析的数据'})}\n\n"
+                    return
+                
+                yield f"data: {json.dumps({'type': 'log', 'message': f'找到 {total_available} 条数据需要分析'})}\n\n"
+                
+                # 分批获取数据进行分析
+                processed = 0
+                success_count = 0
+                failed_count = 0
+                all_data_items = []
+                
+                # 计算需要多少批次
+                batch_size = 100  # 每批处理100条数据
+                total_batches = (total_available + batch_size - 1) // batch_size
+                
+                for batch_num in range(1, total_batches + 1):
+                    # 更新查询参数
+                    query_params.page = batch_num
+                    query_params.page_size = batch_size
+                    
+                    yield f"data: {json.dumps({'type': 'log', 'message': f'正在获取第 {batch_num}/{total_batches} 批数据...'})}\n\n"
+                    
+                    # 获取当前批次数据
+                    data_result = await data_source_manager.get_data(query_params)
+                    
+                    if not data_result['success']:
+                        error_msg = data_result.get('error', '未知错误')
+                        yield f"data: {json.dumps({'type': 'error', 'message': f'获取第 {batch_num} 批数据失败: {error_msg}'})}\n\n"
+                        continue
+                    
+                    source_data = data_result['data']
+                    
+                    # 处理当前批次的数据
+                    for i, data_item in enumerate(source_data):
+                        try:
+                            processed += 1
+                            processing_start_time = time.time()  # 记录处理开始时间
+                            progress = (processed / total_available) * 100
+                            
+                            yield f"data: {json.dumps({'type': 'progress', 'current': processed, 'total': total_available, 'percentage': progress})}\n\n"
+                            
+                            # 提取文本内容
+                            content_text = data_item.get('content', '') or data_item.get('title', '')
+                            if not content_text:
+                                yield f"data: {json.dumps({'type': 'log', 'message': f'第 {processed} 条数据内容为空，跳过'})}\n\n"
+                                failed_count += 1
+                                continue
+                            
+                            content_preview = content_text[:50] + "..." if len(content_text) > 50 else content_text
+                            yield f"data: {json.dumps({'type': 'log', 'message': f'正在分析第 {processed} 条数据: {content_preview}'})}\n\n"
+                            
+                            # 生成原始ID (使用序号)
+                            original_id = processed
+                            
+                            # 创建分析任务
+                            analysis_tasks = []
+                            if enable_sentiment:
+                                analysis_tasks.append(sentiment_agent.analyze_sentiment(content_text))
+                            if enable_tags:
+                                analysis_tasks.append(tag_agents.analyze_tags(content_text))
+                            if enable_companies:
+                                analysis_tasks.append(company_agent.analyze_companies(content_text))
+                            
+                            # 并行执行所有分析任务
+                            analysis_results = await asyncio.gather(*analysis_tasks, return_exceptions=True)
+                            
+                            # 解析分析结果
+                            sentiment_result = None
+                            tag_results = []
+                            company_results = []
+                            
+                            result_index = 0
+                            if enable_sentiment:
+                                sentiment_result = analysis_results[result_index] if not isinstance(analysis_results[result_index], Exception) else None
+                                result_index += 1
+                            if enable_tags:
+                                tag_results = analysis_results[result_index] if not isinstance(analysis_results[result_index], Exception) else []
+                                result_index += 1
+                            if enable_companies:
+                                company_results = analysis_results[result_index] if not isinstance(analysis_results[result_index], Exception) else []
+                            
+                            # 构建标签结果字典
+                            tag_results_dict = {}
+                            if tag_results:
+                                for tag_result in tag_results:
+                                    tag_results_dict[tag_result.tag] = {
+                                        'belongs': tag_result.belongs,
+                                        'reason': tag_result.reason
+                                    }
+                            
+                            # 生成内容摘要 - 使用AI生成真正的摘要
+                            try:
+                                from ali_llm_client import AliLLMClient
+                                llm_client = AliLLMClient()
+                                summary = llm_client.generate_summary(content_text)
+                                yield f"data: {json.dumps({'type': 'log', 'message': f'第 {processed} 条数据摘要生成完成'})}\n\n"
+                            except Exception as e:
+                                summary = content_text[:200] + "..." if len(content_text) > 200 else content_text
+                                yield f"data: {json.dumps({'type': 'warning', 'message': f'第 {processed} 条数据摘要生成失败，使用截取摘要: {str(e)}'})}\n\n"
+                            
+                            # 准备数据用于重复检测
+                            data_for_duplicate = {
+                                'id': original_id,
+                                'content': content_text,
+                                'title': data_item.get('title', '无标题'),
+                                'publish_time': data_item.get('publish_time', datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+                            }
+                            all_data_items.append(data_for_duplicate)
+                            
+                            # 暂时存储分析结果，等待重复检测
+                            temp_save_data = {
+                                'original_id': original_id,
+                                'title': data_item.get('title', '无标题'),
+                                'content': content_text,
+                                'summary': summary,
+                                'source': data_item.get('source', data_source),
+                                'publish_time': data_item.get('publish_time', datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
+                                'sentiment_level': sentiment_result.level if sentiment_result else '未知',
+                                'sentiment_reason': sentiment_result.reason if sentiment_result else '无原因',
+                                'companies': ','.join([company.name for company in company_results]) if company_results else '',
+                                'processing_time': round(time.time() - processing_start_time, 2),  # 处理时间（秒）
+                                'tag_results': tag_results_dict
+                            }
+                            
+                            # 将分析结果与数据项关联
+                            data_for_duplicate['analysis_result'] = temp_save_data
+                            
+                            yield f"data: {json.dumps({'type': 'log', 'message': f'第 {processed} 条数据分析完成，等待重复检测...'})}\n\n"
+                            
+                        except Exception as e:
+                            failed_count += 1
+                            yield f"data: {json.dumps({'type': 'log', 'message': f'第 {processed} 条数据分析失败: {str(e)}'})}\n\n"
+                            continue
+                
+                # 执行批量重复检测
+                if all_data_items:
+                    yield f"data: {json.dumps({'type': 'log', 'message': f'开始执行SimHash重复检测，共 {len(all_data_items)} 条数据...'})}\n\n"
+                    
+                    try:
+                        # 执行重复检测
+                        duplicated_results = duplicate_manager.detect_duplicates(all_data_items)
+                        
+                        yield f"data: {json.dumps({'type': 'log', 'message': '重复检测完成，开始保存到数据库...'})}\n\n"
+                        
+                        # 保存带有重复检测结果的数据
+                        for result_item in duplicated_results:
+                            try:
+                                analysis_result = result_item['analysis_result']
+                                
+                                # 添加重复检测结果
+                                save_data = {
+                                    **analysis_result,
+                                    'duplicate_id': result_item['duplicate_id'],
+                                    'duplication_rate': result_item['duplication_rate'],
+                                    'session_id': session_id,  # 添加会话ID
+                                }
+                                
+                                # 保存到结果数据库
+                                save_result = result_db.save_analysis_result(save_data)
+                                
+                                if save_result['success']:
+                                    success_count += 1
+                                elif save_result.get('duplicate', False):
+                                    # 跳过重复记录，不算作失败
+                                    item_id = result_item['id']
+                                    yield f"data: {json.dumps({'type': 'log', 'message': f'ID {item_id} 已存在，跳过重复保存'})}\n\n"
+                                else:
+                                    save_error = save_result.get('message', '未知错误')
+                                    failed_count += 1
+                                    item_id = result_item['id']
+                                    yield f"data: {json.dumps({'type': 'log', 'message': f'ID {item_id} 保存失败: {save_error}'})}\n\n"
+                                    
+                            except Exception as e:
+                                failed_count += 1
+                                item_id = result_item.get('id', '未知')
+                                yield f"data: {json.dumps({'type': 'log', 'message': f'ID {item_id} 处理失败: {str(e)}'})}\n\n"
+                        
+                        # 输出重复检测统计
+                        duplicate_count = sum(1 for item in duplicated_results if item['is_duplicate'])
+                        yield f"data: {json.dumps({'type': 'log', 'message': f'重复检测完成！发现 {duplicate_count} 条重复文本'})}\n\n"
+                        
+                    except Exception as e:
+                        yield f"data: {json.dumps({'type': 'error', 'message': f'重复检测失败: {str(e)}'})}\n\n"
+                
+                # 完成
+                completion_msg = f'批量解析完成！总处理: {processed}, 成功: {success_count}, 失败: {failed_count}'
+                yield f"data: {json.dumps({'type': 'complete', 'total_processed': processed, 'success_count': success_count, 'failed_count': failed_count, 'session_id': session_id, 'message': completion_msg})}\n\n"
+                
+                # 自动触发去重和导出流程
+                if success_count > 0:
+                    yield f"data: {json.dumps({'type': 'log', 'message': '开始自动去重和导出流程...'})}\n\n"
+                    
+                    try:
+                        # 执行自动去重
+                        yield f"data: {json.dumps({'type': 'log', 'message': '正在执行数据库去重...'})}\n\n"
+                        
+                        # 调用去重模块
+                        from deduplicate_any_json import deduplicate_database_records
+                        dedup_result = deduplicate_database_records()
+                        
+                        if dedup_result['success']:
+                            duplicates_removed = dedup_result['duplicates_removed']
+                            yield f"data: {json.dumps({'type': 'log', 'message': f'去重完成！删除重复记录: {duplicates_removed}'})}\n\n"
+                            
+                            # 执行自动导出
+                            yield f"data: {json.dumps({'type': 'log', 'message': '正在执行自动导出...'})}\n\n"
+                            
+                            from deduplicate_any_json import auto_export_after_dedup
+                            export_result = auto_export_after_dedup()
+                            
+                            if export_result['success']:
+                                export_file = export_result['export_file']
+                                yield f"data: {json.dumps({'type': 'log', 'message': f'自动导出完成！文件: {export_file}'})}\n\n"
+                            else:
+                                export_error = export_result['message']
+                                yield f"data: {json.dumps({'type': 'warning', 'message': f'自动导出失败: {export_error}'})}\n\n"
+                        else:
+                            dedup_error = dedup_result['message']
+                            yield f"data: {json.dumps({'type': 'warning', 'message': f'去重失败: {dedup_error}'})}\n\n"
+                            
+                    except Exception as e:
+                        yield f"data: {json.dumps({'type': 'warning', 'message': f'自动去重导出过程中发生错误: {str(e)}'})}\n\n"
+                
+            except Exception as e:
+                yield f"data: {json.dumps({'type': 'error', 'message': f'批量解析过程中发生错误: {str(e)}'})}\n\n"
+        
+        return StreamingResponse(
+            generate_stream(),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no"
+            }
+        )
+        
+    except Exception as e:
+        logger.error(f"批量解析失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"批量解析失败: {str(e)}")

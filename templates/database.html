@@ -304,7 +304,7 @@
             }
             
             try {
-                showMessage('正在导入数据，请稍候...', 'info');
+                showMessage('正在导入数据请稍候...', 'info');
                 
                 const response = await fetch('/api/database/import', {
                     method: 'POST',
@@ -596,7 +596,7 @@
                     html += `<button class="btn" onclick="changePage(${currentPage - 1})">上一页</button>`;
                 }
                 
-                html += `<span>第 ${currentPage} 页，共 ${totalPages} 页 (总计 ${totalRecords} 条)</span>`;
+                html += `<span>第 ${currentPage} 页共 ${totalPages} 页 (总计 ${totalRecords} 条)</span>`;
                 
                 if (currentPage < totalPages) {
                     html += `<button class="btn" onclick="changePage(${currentPage + 1})">下一页</button>`;

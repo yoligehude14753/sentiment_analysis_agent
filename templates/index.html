@@ -11,7 +11,7 @@
 </head>
 <body>
     <div class="container">
-        <!-- 固定导航栏 -->
+        <!-- 固定导航?-->
         <nav class="main-nav">
             <div class="nav-container">
                 <a href="/" class="nav-item">
@@ -26,6 +26,10 @@
                 <a href="/config" class="nav-item">
                     <i class="fas fa-robot"></i>
                     <span>Agent配置</span>
+                </a>
+                <a href="/data-source-config" class="nav-item">
+                    <i class="fas fa-cloud"></i>
+                    <span>数据源配置</span>
                 </a>
                 <a href="/database-management" class="nav-item" target="_blank">
                     <i class="fas fa-database"></i>
@@ -44,26 +48,25 @@
                         <h2><i class="fas fa-search"></i> 数据搜索</h2>
                         <div class="search-box">
                             <div class="search-input-group">
-                                <input type="text" class="search-input" placeholder="输入关键词搜索标题、内容或标签...">
+                                <input type="text" class="search-input" placeholder="输入关键词搜索标题内容或标签...">
                                 <button class="btn btn-primary" onclick="performSearch()">
                                     <i class="fas fa-search"></i> 搜索
                                 </button>
                             </div>
                             
                             <button class="btn btn-secondary" onclick="toggleAdvancedSearch()">
-                                <i class="fas fa-filter"></i> 筛选
-                            </button>
+                                <i class="fas fa-filter"></i> 筛?                            </button>
                             
                             <div id="advancedSearch" class="advanced-search" style="display: none;">
                                 <div class="advanced-options">
                                     <div class="filter-row">
                                         <div class="filter-group">
-                                            <label for="sentimentLevel">情感等级：</label>
+                                            <label for="sentimentLevel">情感等级?/label>
                                             <select id="sentimentLevel" name="sentimentLevel" class="form-control">
                                                 <option>全部</option>
                                                 <option>正面</option>
-                                                <option>中性</option>
-                                                <option>负面一级</option>
+                                                <option>中?/option>
+                                                <option>负面一?/option>
                                                 <option>负面二级</option>
                                                 <option>负面三级</option>
                                             </select>
@@ -71,35 +74,35 @@
                                     </div>
                                     <div class="filter-row">
                                         <div class="filter-group">
-                                            <label for="riskTag">风险标签：</label>
+                                            <label for="riskTag">风险标签?/label>
                                             <select id="riskTag" name="riskTag" class="form-control">
                                                 <option>全部</option>
                                                 <!-- 公司治理与合规风险类 -->
                                                 <option>同业竞争</option>
                                                 <option>股权与控制权</option>
                                                 <option>关联交易</option>
-                                                <option>历史沿革与股东核查</option>
+                                                <option>历史沿革与股东核?/option>
                                                 <option>重大违法违规</option>
-                                                <!-- 财务真实性与经营能力类 -->
-                                                <option>收入与成本</option>
-                                                <option>财务内控不规范</option>
+                                                <!-- 财务真实性与经营能力?-->
+                                                <option>收入与成?/option>
+                                                <option>财务内控不规?/option>
                                                 <option>客户与供应商</option>
-                                                <option>资产质量与减值</option>
-                                                <option>研发与技术</option>
+                                                <option>资产质量与减?/option>
+                                                <option>研发与技?/option>
                                                 <!-- 发行与市场风险类 -->
-                                                <option>募集资金用途</option>
-                                                <option>突击分红与对赌协议</option>
-                                                <option>市场传闻与负面报道</option>
-                                                <option>行业政策与环境</option>
+                                                <option>募集资金用?/option>
+                                                <option>突击分红与对赌协?/option>
+                                                <option>市场传闻与负面报?/option>
+                                                <option>行业政策与环?/option>
                                             </select>
                                         </div>
                                         <div class="filter-group">
-                                            <label for="publishTime">发布时间：</label>
+                                            <label for="publishTime">发布时间?/label>
                                             <select id="publishTime" name="publishTime" class="form-control">
                                                 <option>全部时间</option>
-                                                <option>最近24小时</option>
-                                                <option>最近7天</option>
-                                                <option>最近30天</option>
+                                                <option>最?4小时</option>
+                                                <option>最??/option>
+                                                <option>最?0?/option>
                                             </select>
                                         </div>
                                     </div>
@@ -108,8 +111,8 @@
                         </div>
                         
                         <div class="search-stats">
-                            <span>找到 <strong id="resultCount">0</strong> 条结果</span>
-                            <span class="search-time">搜索用时：<span id="searchTime">0.00</span>秒</span>
+                            <span>找到 <strong id="resultCount">0</strong> 条结?/span>
+                            <span class="search-time">搜索用时?span id="searchTime">0.00</span>?/span>
                         </div>
                         
                         <div id="searchResults">
@@ -125,15 +128,15 @@
             <!-- 执行任务页面 -->
             <div id="parsing-page" class="page-content">
                 <div class="main-content">
-                    <!-- 左侧：任务配置 -->
+                    <!-- 左侧任务配?-->
                     <div class="task-config-section">
                         <h2><i class="fas fa-cog"></i> 任务配置</h2>
                         
                         <!-- 数据源选择 -->
                         <div class="config-group">
-                            <label for="dataSource">选择数据源：</label>
+                            <label for="dataSource">选择数据源</label>
                             <select id="dataSource" class="form-control">
-                                <option value="舆情数据库">舆情数据库</option>
+                                <option value="舆情数据?>舆情数据?/option>
                                 <option value="自定义数据库">自定义数据库</option>
                                 <option value="外部API">外部API</option>
                             </select>
@@ -141,21 +144,20 @@
 
                         <!-- 自定义数据库配置 -->
                         <div id="customDatabaseConfig" class="config-group hidden">
-                            <label>数据库配置：</label>
+                            <label>数据库配置</label>
                             <button type="button" id="customDatabaseConfigBtn" class="btn btn-outline-primary">
-                                <i class="fas fa-cog"></i> 配置数据库连接
-                            </button>
+                                <i class="fas fa-cog"></i> 配置数据库连?                            </button>
                         </div>
 
                         <!-- 时间范围选择 -->
                         <div class="config-group">
-                            <label>时间范围选择：</label>
+                            <label>时间范围选择?/label>
                             <div class="time-range-selector">
                                 <div class="time-range-inputs">
-                                    <label for="startTime">开始时间：</label>
+                                    <label for="startTime">开始时间</label>
                                     <input type="datetime-local" id="startTime" class="form-control">
                                     
-                                    <label for="endTime">结束时间：</label>
+                                    <label for="endTime">结束时间?/label>
                                     <input type="datetime-local" id="endTime" class="form-control">
                                 </div>
                                 
@@ -163,45 +165,43 @@
                                 <div class="time-range-note" style="margin-top: 8px; padding: 8px 12px; background-color: #f8f9fa; border-radius: 4px; border-left: 3px solid #17a2b8;">
                                     <small style="color: #6c757d; font-size: 12px;">
                                         <i class="fas fa-info-circle"></i> 
-                                        时间范围包含开始和结束时间点（BETWEEN查询）
-                                    </small>
+                                        时间范围包含开始和结束时间点BETWEEN查询?                                    </small>
                                 </div>
                                 
-                                <!-- 快速时间范围设置 -->
+                                <!-- 快速时间范围设?-->
                                 <div class="quick-time-buttons">
                                     <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setQuickTimeRange('today')">今天</button>
                                     <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setQuickTimeRange('yesterday')">昨天</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setQuickTimeRange('week')">最近7天</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setQuickTimeRange('month')">最近30天</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setQuickTimeRange('week')">最??/button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setQuickTimeRange('month')">最?0?/button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 数据量预览 -->
+                        <!-- 数据量预?-->
                         <div id="dataPreview" class="config-group hidden">
-                            <label>数据量预览：</label>
+                            <label>数据量预览</label>
                             <div class="data-preview-info">
                                 <div class="preview-item">
-                                    <span class="label">选定时间范围：</span>
+                                    <span class="label">选定时间范围?/span>
                                     <span id="selectedTimeRange" class="value">--</span>
                                 </div>
                                 <div class="preview-item">
-                                    <span class="label">需要解析的数据量：</span>
+                                    <span class="label">需要解析的数据量</span>
                                     <span id="dataCount" class="value">--</span>
                                 </div>
                                 <div class="preview-item">
-                                    <span class="label">预计处理时间：</span>
+                                    <span class="label">预计处理时间?/span>
                                     <span id="estimatedProcessTime" class="value">--</span>
                                 </div>
                             </div>
                             <button id="refreshDataCountBtn" class="btn btn-sm btn-info">
-                                <i class="fas fa-sync-alt"></i> 刷新数据量
-                            </button>
+                                <i class="fas fa-sync-alt"></i> 刷新数据?                            </button>
                         </div>
 
                         <!-- 分析配置 -->
                         <div class="config-group">
-                            <label>分析配置：</label>
+                            <label>分析配置?/label>
                             <div class="checkbox-group">
                                 <label class="checkbox-item">
                                     <input type="checkbox" id="enableSentiment" checked>
@@ -221,26 +221,24 @@
                                 <label class="checkbox-item">
                                     <input type="checkbox" id="enableDuplication" checked>
                                     <span class="checkmark"></span>
-                                    重复度检测
-                                </label>
+                                    重复度检?                                </label>
                             </div>
                         </div>
 
                         <!-- 结果存储配置 -->
                         <div class="config-group">
-                            <label>结果存储配置：</label>
+                            <label>结果存储配置?/label>
                             <div class="storage-config">
-                                <label for="resultDatabase">结果数据库：</label>
+                                <label for="resultDatabase">结果数据库</label>
                                 <select id="resultDatabase" class="form-control">
-                                    <option value="analysis_results">分析结果数据库</option>
+                                    <option value="analysis_results">分析结果数据?/option>
                                     <option value="custom">自定义数据库</option>
                                 </select>
                                 
                                 <div id="customResultConfig" class="sub-config hidden">
-                                    <label>结果数据库配置：</label>
+                                    <label>结果数据库配置</label>
                                     <button type="button" id="customResultConfigBtn" class="btn btn-outline-primary">
-                                        <i class="fas fa-cog"></i> 配置结果数据库
-                                    </button>
+                                        <i class="fas fa-cog"></i> 配置结果数据?                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -248,11 +246,9 @@
                         <!-- 执行按钮 -->
                         <div class="button-group">
                             <button id="startTaskBtn" class="btn btn-primary">
-                                <i class="fas fa-play"></i> 开始执行
-                            </button>
+                                <i class="fas fa-play"></i> 开始执?                            </button>
                             <button id="analyzeLatestBtn" class="btn btn-info">
-                                <i class="fas fa-clock"></i> 分析最新数据
-                            </button>
+                                <i class="fas fa-clock"></i> 分析最新数?                            </button>
                             <button id="stopTaskBtn" class="btn btn-danger hidden">
                                 <i class="fas fa-stop"></i> 停止任务
                             </button>
@@ -263,7 +259,7 @@
                         </div>
                     </div>
 
-                    <!-- 右侧：任务执行和监控 -->
+                    <!-- 右侧任务执行和监控 -->
                     <div class="task-execution-section">
                         <h2><i class="fas fa-tasks"></i> 任务执行</h2>
                         
@@ -276,11 +272,11 @@
                                     <span class="stat-value" id="totalData">0</span>
                                 </div>
                                 <div class="stat-item">
-                                    <span class="stat-label">已处理</span>
+                                    <span class="stat-label">已处?/span>
                                     <span class="stat-value" id="processedData">0</span>
                                 </div>
                                 <div class="stat-item">
-                                    <span class="stat-label">成功率</span>
+                                    <span class="stat-label">成功?/span>
                                     <span class="stat-value" id="successRate">0%</span>
                                 </div>
                                 <div class="stat-item">
@@ -290,16 +286,16 @@
                             </div>
                         </div>
 
-                        <!-- 执行状态 -->
+                        <!-- 执行状?-->
                         <div class="execution-status">
-                            <h3><i class="fas fa-info-circle"></i> 执行状态</h3>
+                            <h3><i class="fas fa-info-circle"></i> 执行状?/h3>
                             <div class="status-info">
                                 <div class="status-item">
-                                    <span class="status-label">任务状态：</span>
+                                    <span class="status-label">任务状态</span>
                                     <span class="status-value" id="taskStatus">空闲</span>
                                 </div>
                                 <div class="status-item">
-                                    <span class="status-label">执行进度：</span>
+                                    <span class="status-label">执行进度?/span>
                                     <div class="progress-container">
                                         <div class="progress-bar">
                                             <div class="progress-fill" id="executionProgress" style="width: 0%"></div>
@@ -308,8 +304,8 @@
                                     </div>
                                 </div>
                                 <div class="status-item">
-                                    <span class="status-label">当前处理：</span>
-                                    <span class="status-value" id="currentItemInfo">等待任务开始...</span>
+                                    <span class="status-label">当前处理?/span>
+                                    <span class="status-value" id="currentItemInfo">等待任务开?..</span>
                                 </div>
                             </div>
                         </div>
@@ -320,7 +316,7 @@
                             <div class="log-container" id="logContainer">
                                 <div class="log-entry">
                                     <span class="log-time">--:--:--</span>
-                                    <span class="log-message log-info">系统就绪，等待任务配置...</span>
+                                    <span class="log-message log-info">系统就绪等待任务配?..</span>
                                 </div>
                             </div>
                             <div class="log-controls">
@@ -333,9 +329,9 @@
                             </div>
                         </div>
 
-                        <!-- 错误汇总 -->
+                        <!-- 错误汇?-->
                         <div class="error-summary hidden" id="errorSummary">
-                            <h3><i class="fas fa-exclamation-triangle"></i> 错误汇总</h3>
+                            <h3><i class="fas fa-exclamation-triangle"></i> 错误汇?/h3>
                             <div class="error-list" id="errorList">
                                 <!-- 错误信息将在这里显示 -->
                             </div>
@@ -346,19 +342,19 @@
                             <h3><i class="fas fa-check-circle"></i> 任务完成</h3>
                             <div class="completion-summary">
                                 <div class="summary-item">
-                                    <span class="summary-label">总处理数据：</span>
+                                    <span class="summary-label">总处理数据</span>
                                     <span class="summary-value" id="finalTotal">0</span>
                                 </div>
                                 <div class="summary-item">
-                                    <span class="summary-label">成功处理：</span>
+                                    <span class="summary-label">成功处理?/span>
                                     <span class="summary-value" id="finalSuccess">0</span>
                                 </div>
                                 <div class="summary-item">
-                                    <span class="summary-label">处理失败：</span>
+                                    <span class="summary-label">处理失败?/span>
                                     <span class="summary-value" id="finalFailed">0</span>
                                 </div>
                                 <div class="summary-item">
-                                    <span class="summary-label">总耗时：</span>
+                                    <span class="summary-label">总耗时?/span>
                                     <span class="summary-value" id="finalTime">--</span>
                                 </div>
                             </div>
@@ -376,31 +372,30 @@
             <div class="modal-body">
                 <div class="task-confirm-info">
                     <div class="confirm-item">
-                        <span class="confirm-label">数据源：</span>
+                        <span class="confirm-label">数据源</span>
                         <span class="confirm-value" id="confirmDataSource">--</span>
                     </div>
                     <div class="confirm-item">
-                        <span class="confirm-label">数据范围：</span>
+                        <span class="confirm-label">数据范围?/span>
                         <span class="confirm-value" id="confirmDataRange">--</span>
                     </div>
                     <div class="confirm-item">
-                        <span class="confirm-label">分析模块：</span>
+                        <span class="confirm-label">分析模块?/span>
                         <span class="confirm-value" id="confirmAnalysisModules">--</span>
                     </div>
                     <div class="confirm-item">
-                        <span class="confirm-label">预计数据量：</span>
+                        <span class="confirm-label">预计数据量</span>
                         <span class="confirm-value" id="confirmDataCount">--</span>
                     </div>
                 </div>
                 <div class="warning-box">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <span>确认开始执行后，系统将开始分析选定的数据。此过程可能需要较长时间，请确保网络连接稳定。</span>
+                    <span>确认开始执行后系统将开始分析选定的数据此过程可能需要较长时间请确保网络连接稳定?/span>
                 </div>
             </div>
             <div class="modal-footer">
                 <button id="confirmTaskBtn" class="btn btn-primary">
-                    <i class="fas fa-play"></i> 确认开始
-                </button>
+                    <i class="fas fa-play"></i> 确认开?                </button>
                 <button id="cancelTaskBtn" class="btn btn-secondary">
                     <i class="fas fa-times"></i> 取消
                 </button>
@@ -416,15 +411,14 @@
                     <div class="input-section">
                         <h2><i class="fas fa-edit"></i> 文本输入</h2>
                         <div class="input-group">
-                            <label for="content">请输入需要分析的文本内容：</label>
+                            <label for="content">请输入需要分析的文本内容?/label>
                             <textarea id="content" rows="8" placeholder="在此输入文本内容..."></textarea>
-                            <div class="char-count">字数：<span id="charCount">0</span></div>
+                            <div class="char-count">字数?span id="charCount">0</span></div>
                         </div>
                         
                         <div class="button-group">
                             <button id="analyzeBtn" class="btn btn-primary">
-                                <i class="fas fa-play"></i> 开始分析
-                            </button>
+                                <i class="fas fa-play"></i> 开始分?                            </button>
                             <button id="clearBtn" class="btn btn-secondary">
                                 <i class="fas fa-trash"></i> 清空内容
                             </button>
@@ -442,7 +436,7 @@
                                     <i class="fas fa-file-csv"></i> 选择CSV文件
                                 </button>
                             </div>
-                            <p class="help-text">支持CSV格式文件，每行包含一条文本内容</p>
+                            <p class="help-text">支持CSV格式文件每行包含一条文本内?/p>
                         </div>
 
                         <!-- 去重统计区域 -->
@@ -462,7 +456,7 @@
                                     <span class="stat-value" id="duplicateTexts">0</span>
                                 </div>
                                 <div class="stat-item">
-                                    <span class="stat-label">重复率</span>
+                                    <span class="stat-label">重复?/span>
                                     <span class="stat-value" id="duplicationRate">0%</span>
                                 </div>
                             </div>
@@ -476,10 +470,10 @@
                     <div class="results-section">
                         <h2><i class="fas fa-chart-line"></i> 分析结果</h2>
                         
-                        <!-- 加载状态 -->
+                        <!-- 加载状?-->
                         <div id="loading" class="loading hidden">
                             <div class="spinner"></div>
-                            <p>正在分析中，请稍候...</p>
+                            <p>正在分析中请稍?..</p>
                         </div>
 
                         <!-- 进度显示 -->
@@ -511,11 +505,11 @@
                                 <h3><i class="fas fa-heart"></i> 情感分析</h3>
                                 <div class="sentiment-info">
                                     <div class="sentiment-item">
-                                        <span class="label">情感等级：</span>
+                                        <span class="label">情感等级?/span>
                                         <span class="value" id="level">等待分析...</span>
                                     </div>
                                     <div class="sentiment-item">
-                                        <span class="label">分析原因：</span>
+                                        <span class="label">分析原因?/span>
                                         <span class="value" id="reason">等待分析...</span>
                                     </div>
                                 </div>
@@ -529,28 +523,28 @@
                                 </div>
                             </div>
 
-                            <!-- 重复度分析 -->
+                            <!-- 重复度分?-->
                             <div class="result-card">
-                                <h3><i class="fas fa-copy"></i> 重复度分析</h3>
+                                <h3><i class="fas fa-copy"></i> 重复度分?/h3>
                                 <div class="duplicate-info">
                                     <div class="duplicate-item">
-                                        <span class="label">重复状态：</span>
+                                        <span class="label">重复状态</span>
                                         <span class="value" id="duplicateStatus">等待分析...</span>
                                     </div>
                                     <div class="duplicate-item">
-                                        <span class="label">相似度：</span>
+                                        <span class="label">相似度</span>
                                         <span class="value" id="similarityScore">等待分析...</span>
                                     </div>
                                     <div class="duplicate-item">
-                                        <span class="label">汉明距离：</span>
+                                        <span class="label">汉明距离?/span>
                                         <span class="value" id="hammingDistance">等待分析...</span>
                                     </div>
                                     <div class="duplicate-item">
-                                        <span class="label">SimHash值：</span>
+                                        <span class="label">SimHash值</span>
                                         <span class="value" id="simhashValue">等待分析...</span>
                                     </div>
                                     <div class="duplicate-item">
-                                        <span class="label">重复组：</span>
+                                        <span class="label">重复组</span>
                                         <span class="value" id="duplicateGroup">等待分析...</span>
                                     </div>
                                 </div>
@@ -578,25 +572,25 @@
                 <div class="agents-container">
                     <h2><i class="fas fa-robot"></i> Agent配置管理</h2>
                     
-                    <!-- Agent状态概览 -->
+                    <!-- Agent状态概?-->
                     <div class="agents-overview">
                         <div class="overview-card">
-                            <h3><i class="fas fa-chart-pie"></i> 系统状态</h3>
+                            <h3><i class="fas fa-chart-pie"></i> 系统状?/h3>
                             <div class="status-grid">
                                 <div class="status-item">
-                                    <span class="status-label">总Agent数</span>
+                                    <span class="status-label">总Agent?/span>
                                     <span class="status-value" id="totalAgents">14</span>
                                 </div>
                                 <div class="status-item">
-                                    <span class="status-label">运行中</span>
+                                    <span class="status-label">运行?/span>
                                     <span class="status-value running" id="runningAgents">14</span>
                                 </div>
                                 <div class="status-item">
-                                    <span class="status-label">已停止</span>
+                                    <span class="status-label">已停?/span>
                                     <span class="status-value stopped" id="stoppedAgents">0</span>
                                 </div>
                                 <div class="status-item">
-                                    <span class="status-label">错误状态</span>
+                                    <span class="status-label">错误状?/span>
                                     <span class="status-value error" id="errorAgents">0</span>
                                 </div>
                             </div>
@@ -607,7 +601,7 @@
                     <div class="agents-list">
                         <h3><i class="fas fa-list"></i> Agent详细信息</h3>
                         <div class="agents-grid" id="agentsGrid">
-                            <!-- Agent项目将通过JavaScript动态生成 -->
+                            <!-- Agent项目将通过JavaScript动态生?-->
                         </div>
                     </div>
 
@@ -616,14 +610,11 @@
                         <h3><i class="fas fa-cog"></i> 配置操作</h3>
                         <div class="action-buttons">
                             <button class="btn btn-primary" onclick="refreshAgentsStatus()">
-                                <i class="fas fa-sync-alt"></i> 刷新状态
-                            </button>
+                                <i class="fas fa-sync-alt"></i> 刷新状?                            </button>
                             <button class="btn btn-success" onclick="startAllAgents()">
-                                <i class="fas fa-play"></i> 启动所有
-                            </button>
+                                <i class="fas fa-play"></i> 启动所?                            </button>
                             <button class="btn btn-warning" onclick="stopAllAgents()">
-                                <i class="fas fa-stop"></i> 停止所有
-                            </button>
+                                <i class="fas fa-stop"></i> 停止所?                            </button>
                             <button class="btn btn-info" onclick="showAgentConfig()">
                                 <i class="fas fa-cog"></i> 配置参数
                             </button>
@@ -635,7 +626,7 @@
 
         <!-- 页脚 -->
         <div class="footer">
-            <p>&copy; 2024 舆情分析系统. 保留所有权利.</p>
+            <p>&copy; 2024 舆情分析系统. 保留所有权?</p>
         </div>
     </div>
 
@@ -653,7 +644,7 @@
                         <span class="tag-value" id="modalTagName">-</span>
                     </div>
                     <div class="tag-info">
-                        <span class="tag-label">匹配状态</span>
+                        <span class="tag-label">匹配状?/span>
                         <span class="tag-value" id="modalTagStatus">-</span>
                     </div>
                     <div class="tag-info">
@@ -691,9 +682,9 @@
         </div>
     </div>
 
-    <!-- 键盘快捷键提示 -->
+    <!-- 键盘快捷键提?-->
     <div id="keyboardHints" class="keyboard-hints">
-        <div class="hint-item"><span class="key">Ctrl+Enter</span> 开始分析</div>
+        <div class="hint-item"><span class="key">Ctrl+Enter</span> 开始分?/div>
         <div class="hint-item"><span class="key">Ctrl+Shift+C</span> 清空内容</div>
         <div class="hint-item"><span class="key">Ctrl+U</span> 上传文件</div>
     </div>
@@ -704,13 +695,13 @@
     <div id="databaseConfigModal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h3><i class="fas fa-database"></i> 数据库配置</h3>
+                <h3><i class="fas fa-database"></i> 数据库配?/h3>
                 <span id="closeDatabaseModal" class="close">&times;</span>
             </div>
             <div class="modal-body">
                 <div class="database-config-form">
                     <div class="form-group">
-                        <label for="modalDatabaseType">数据库类型：</label>
+                        <label for="modalDatabaseType">数据库类型</label>
                         <select id="modalDatabaseType" class="form-control">
                             <option value="sqlite">SQLite</option>
                             <option value="mysql">MySQL</option>
@@ -720,27 +711,27 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="modalDatabaseHost">数据库地址：</label>
+                        <label for="modalDatabaseHost">数据库地址?/label>
                         <input type="text" id="modalDatabaseHost" class="form-control" placeholder="localhost">
                     </div>
                     
                     <div class="form-group">
-                        <label for="modalDatabasePort">端口：</label>
+                        <label for="modalDatabasePort">端口?/label>
                         <input type="number" id="modalDatabasePort" class="form-control" placeholder="3306">
                     </div>
                     
                     <div class="form-group">
-                        <label for="modalDatabaseName">数据库名：</label>
+                        <label for="modalDatabaseName">数据库名?/label>
                         <input type="text" id="modalDatabaseName" class="form-control" placeholder="database_name">
                     </div>
                     
                     <div class="form-group">
-                        <label for="modalDatabaseUser">用户名：</label>
+                        <label for="modalDatabaseUser">用户名</label>
                         <input type="text" id="modalDatabaseUser" class="form-control" placeholder="username">
                     </div>
                     
                     <div class="form-group">
-                        <label for="modalDatabasePassword">密码：</label>
+                        <label for="modalDatabasePassword">密码?/label>
                         <input type="password" id="modalDatabasePassword" class="form-control" placeholder="password">
                     </div>
                 </div>
@@ -757,13 +748,13 @@
     <div id="resultDatabaseConfigModal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h3><i class="fas fa-database"></i> 结果数据库配置</h3>
+                <h3><i class="fas fa-database"></i> 结果数据库配?/h3>
                 <span id="closeResultDatabaseModal" class="close">&times;</span>
             </div>
             <div class="modal-body">
                 <div class="database-config-form">
                     <div class="form-group">
-                        <label for="modalResultDatabaseType">数据库类型：</label>
+                        <label for="modalResultDatabaseType">数据库类型</label>
                         <select id="modalResultDatabaseType" class="form-control">
                             <option value="sqlite">SQLite</option>
                             <option value="mysql">MySQL</option>
@@ -773,27 +764,27 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="modalResultDatabaseHost">数据库地址：</label>
+                        <label for="modalResultDatabaseHost">数据库地址?/label>
                         <input type="text" id="modalResultDatabaseHost" class="form-control" placeholder="localhost">
                     </div>
                     
                     <div class="form-group">
-                        <label for="modalResultDatabasePort">端口：</label>
+                        <label for="modalResultDatabasePort">端口?/label>
                         <input type="number" id="modalResultDatabasePort" class="form-control" placeholder="3306">
                     </div>
                     
                     <div class="form-group">
-                        <label for="modalResultDatabaseName">数据库名：</label>
+                        <label for="modalResultDatabaseName">数据库名?/label>
                         <input type="text" id="modalResultDatabaseName" class="form-control" placeholder="analysis_results">
                     </div>
                     
                     <div class="form-group">
-                        <label for="modalResultDatabaseUser">用户名：</label>
+                        <label for="modalResultDatabaseUser">用户名</label>
                         <input type="text" id="modalResultDatabaseUser" class="form-control" placeholder="username">
                     </div>
                     
                     <div class="form-group">
-                        <label for="modalResultDatabasePassword">密码：</label>
+                        <label for="modalResultDatabasePassword">密码?/label>
                         <input type="password" id="modalResultDatabasePassword" class="form-control" placeholder="password">
                     </div>
                 </div>
@@ -819,8 +810,7 @@
                 return;
             }
             
-            // 显示加载状态
-            showSearchLoading();
+            // 显示加载状?            showSearchLoading();
             
             try {
                 const response = await fetch(`/api/analysis_results?search=${encodeURIComponent(query)}&page=1&page_size=10`);
@@ -833,15 +823,14 @@
                 }
             } catch (error) {
                 console.error('搜索错误:', error);
-                displaySearchError('网络错误，请稍后重试');
+                displaySearchError('网络错误请稍后重试');
             }
         }
         
-        // 显示搜索加载状态
-        function showSearchLoading() {
+        // 显示搜索加载状?        function showSearchLoading() {
             const searchResults = document.getElementById('searchResults');
             if (searchResults) {
-                searchResults.innerHTML = '<div class="loading"><div class="spinner"></div><p>搜索中...</p></div>';
+                searchResults.innerHTML = '<div class="loading"><div class="spinner"></div><p>搜索?..</p></div>';
             }
         }
         
@@ -879,16 +868,14 @@
             }
         }
         
-        // 创建搜索结果行
-        function createSearchResultRow(result) {
-            // 调试输出：检查result对象
+        // 创建搜索结果?        function createSearchResultRow(result) {
+            // 调试输出检查result对象
             console.log('Creating result row for:', result);
             console.log('Result ID:', result.id, 'Original ID:', result.original_id);
             
             const row = document.createElement('div');
             row.className = 'search-result-row';
-            // 移除整行的点击事件，让标题链接可以正常跳转
-
+            // 移除整行的点击事件让标题链接可以正常跳?
             const publishTime = result.publish_time ? new Date(result.publish_time).toLocaleDateString('zh-CN') : '未知';
 
             // 处理标签
@@ -901,7 +888,7 @@
                             tags.push(...parsedTags);
                         }
                     } catch (e) {
-                        if (result.tags !== '无') {
+                        if (result.tags !== '?) {
                             tags.push(...result.tags.split(',').map(t => t.trim()).filter(t => t));
                         }
                     }
@@ -910,17 +897,16 @@
                 }
             }
             
-            // 如果没有找到标签，检查标签字段
-            if (tags.length === 0) {
+            // 如果没有找到标签检查标签字?            if (tags.length === 0) {
                 const tagNames = [
-                    '同业竞争', '股权与控制权', '关联交易', '历史沿革与股东核查', '重大违法违规',
-                    '收入与成本', '财务内控不规范', '客户与供应商', '资产质量与减值', '研发与技术',
-                    '募集资金用途', '突击分红与对赌协议', '市场传闻与负面报道', '行业政策与环境'
+                    '同业竞争', '股权与控制权', '关联交易', '历史沿革与股东核?, '重大违法违规',
+                    '收入与成?, '财务内控不规?, '客户与供应商', '资产质量与减?, '研发与技?,
+                    '募集资金用?, '突击分红与对赌协?, '市场传闻与负面报?, '行业政策与环?
                 ];
                 
                 for (const tagName of tagNames) {
                     const tagKey = 'tag_' + tagName.replace(/[^a-zA-Z0-9]/g, '_');
-                    if (result[tagKey] === '是') {
+                    if (result[tagKey] === '?) {
                         tags.push(tagName);
                     }
                 }
@@ -938,12 +924,12 @@
 
             const tagsHtml = tags.length > 0 ?
                 tags.map(tag => `<span class="tag-item clickable-tag" onclick="showTagDetail('${tag}', event)">${tag}</span>`).join('') :
-                '<span class="no-tags">无标签</span>';
+                '<span class="no-tags">无标?/span>';
 
             // 处理公司
             let companies = [];
             if (result.companies && typeof result.companies === 'string') {
-                if (result.companies !== '无' && result.companies.trim()) {
+                if (result.companies !== '? && result.companies.trim()) {
                     companies = result.companies.split(',').map(c => c.trim()).filter(c => c);
                 }
             } else if (Array.isArray(result.companies)) {
@@ -952,9 +938,9 @@
 
             const companiesHtml = companies.length > 0 ?
                 companies.slice(0, 1).map(company => `<span class="company">${company}</span>`).join('') :
-                '<span class="no-company">无相关公司</span>';
+                '<span class="no-company">无相关公?/span>';
 
-            // 情感分析标签 - 简化显示，放在标签旁边
+            // 情感分析标签 - 简化显示放在标签旁边
             const sentimentHtml = `
                 <span class="sentiment-level clickable-sentiment" onclick="showSentimentDetail('${sentimentLevel}', '${sentimentReason}', event)">
                     ${sentimentLevel}
@@ -964,7 +950,7 @@
             row.innerHTML = `
                 <div class="result-header">
                     <h3 class="result-title">
-                        <a href="/detail?id=${result.id || result.original_id || 'unknown'}" class="title-link" style='color: #2563eb !important; text-decoration: underline !important; font-weight: 600 !important; cursor: pointer !important;' onclick="console.log('Link clicked:', '${result.id || result.original_id || 'unknown'}')">${result.title || '无标题'}</a>
+                        <a href="/detail?id=${result.id || result.original_id || 'unknown'}" class="title-link" style='color: #2563eb !important; text-decoration: underline !important; font-weight: 600 !important; cursor: pointer !important;' onclick="console.log('Link clicked:', '${result.id || result.original_id || 'unknown'}')">${result.title || '无标?}</a>
                     </h3>
                     <span class="sentiment-level clickable-sentiment" onclick="showSentimentDetail('${sentimentLevel}', '${sentimentReason}', event)">
                         ${sentimentLevel}
@@ -972,7 +958,7 @@
                     <span class="result-time">${publishTime}</span>
                 </div>
                 <div class="result-content">
-                    <p class="result-summary">${result.summary || '无摘要'}</p>
+                    <p class="result-summary">${result.summary || '无摘?}</p>
                     <div class="result-meta">
                         <div class="result-tags">
                             ${tagsHtml}
@@ -985,9 +971,9 @@
             return row;
         }
         
-        // 文章详情功能已改为页面跳转方式，此函数已移除
+        // 文章详情功能已改为页面跳转方式此函数已移除
         
-        // 文章详情功能已改为页面跳转方式，此函数已移除
+        // 文章详情功能已改为页面跳转方式此函数已移除
         
         // 显示标签详情
         function showTagDetail(tagName, event) {
@@ -998,16 +984,16 @@
             modal.innerHTML = `
                 <div class="tag-detail-content">
                     <div class="tag-detail-header">
-                        <h3>标签详情：${tagName}</h3>
+                        <h3>标签详情?{tagName}</h3>
                         <span class="close-tag-modal" onclick="this.parentElement.parentElement.parentElement.remove()">&times;</span>
                     </div>
                     <div class="tag-detail-body">
                         <div class="tag-description">
-                            <h4>标签说明：</h4>
+                            <h4>标签说明?/h4>
                             <p>${getTagDescription(tagName)}</p>
                         </div>
                         <div class="tag-criteria">
-                            <h4>识别标准：</h4>
+                            <h4>识别标准?/h4>
                             <p>${getTagCriteria(tagName)}</p>
                         </div>
                     </div>
@@ -1037,11 +1023,11 @@
                     </div>
                     <div class="sentiment-detail-body">
                         <div class="sentiment-level-info">
-                            <h4>情感等级：${level}</h4>
+                            <h4>情感等级?{level}</h4>
                             <p>${getSentimentLevelDescription(level)}</p>
                         </div>
                         <div class="sentiment-reason">
-                            <h4>分析原因：</h4>
+                            <h4>分析原因?/h4>
                             <p>${reason || '暂无详细分析原因'}</p>
                         </div>
                     </div>
@@ -1060,56 +1046,56 @@
         // 获取标签描述
         function getTagDescription(tagName) {
             const descriptions = {
-                '同业竞争': '指公司与同行业其他企业之间存在直接或间接的竞争关系，可能影响公司的市场份额和盈利能力。',
-                '股权与控制权': '涉及公司股权结构、股东权益、控制权变更等事项，可能影响公司治理和经营稳定性。',
-                '关联交易': '公司与关联方之间的交易行为，需要关注交易的公允性和必要性。',
-                '历史沿革与股东核查': '公司历史发展过程中的重要事件和股东变更情况，可能影响公司信誉和合规性。',
-                '重大违法违规': '公司或其相关人员存在重大违法违规行为，可能面临法律风险和处罚。',
-                '收入与成本': '公司收入确认和成本核算的规范性，可能影响财务数据的真实性。',
-                '财务内控不规范': '公司财务内部控制制度不完善或执行不到位，可能增加财务风险。',
-                '客户与供应商': '公司与主要客户和供应商的关系稳定性，可能影响经营持续性。',
-                '资产质量与减值': '公司资产质量状况和减值计提的合理性，可能影响资产价值评估。',
-                '研发与技术': '公司研发投入和技术创新能力，可能影响未来发展潜力。',
-                '募集资金用途': '公司募集资金的使用合规性和效率性，可能影响资金使用效果。',
-                '突击分红与对赌协议': '公司突击分红行为或存在对赌协议，可能影响股东权益和公司稳定性。',
-                '市场传闻与负面报道': '市场上关于公司的传闻或负面媒体报道，可能影响公司声誉和股价。',
-                '行业政策与环境': '行业政策变化和外部环境变化对公司经营的影响，可能增加经营风险。'
+                '同业竞争': '指公司与同行业其他企业之间存在直接或间接的竞争关系可能影响公司的市场份额和盈利能力?,
+                '股权与控制权': '涉及公司股权结构股东权益控制权变更等事项可能影响公司治理和经营稳定性?,
+                '关联交易': '公司与关联方之间的交易行为需要关注交易的公允性和必要性?,
+                '历史沿革与股东核?: '公司历史发展过程中的重要事件和股东变更情况可能影响公司信誉和合规性?,
+                '重大违法违规': '公司或其相关人员存在重大违法违规行为可能面临法律风险和处罚?,
+                '收入与成?: '公司收入确认和成本核算的规范性可能影响财务数据的真实性?,
+                '财务内控不规?: '公司财务内部控制制度不完善或执行不到位可能增加财务风险?,
+                '客户与供应商': '公司与主要客户和供应商的关系稳定性可能影响经营持续性?,
+                '资产质量与减?: '公司资产质量状况和减值计提的合理性可能影响资产价值评估?,
+                '研发与技?: '公司研发投入和技术创新能力可能影响未来发展潜力?,
+                '募集资金用?: '公司募集资金的使用合规性和效率性可能影响资金使用效果?,
+                '突击分红与对赌协?: '公司突击分红行为或存在对赌协议可能影响股东权益和公司稳定性?,
+                '市场传闻与负面报?: '市场上关于公司的传闻或负面媒体报道可能影响公司声誉和股价?,
+                '行业政策与环?: '行业政策变化和外部环境变化对公司经营的影响可能增加经营风险?
             };
-            return descriptions[tagName] || '该标签暂无详细说明。';
+            return descriptions[tagName] || '该标签暂无详细说明?;
         }
         
         // 获取标签识别标准
         function getTagCriteria(tagName) {
             const criteria = {
-                '同业竞争': '通过分析公司业务范围、市场份额、竞争对手信息等，识别是否存在同业竞争关系。',
-                '股权与控制权': '分析公司股权结构、股东背景、控制权变更历史等，评估控制权稳定性。',
-                '关联交易': '识别公司与股东、实际控制人、关联企业之间的交易，评估交易的必要性和公允性。',
-                '历史沿革与股东核查': '梳理公司发展历史、股东变更记录、重要事件等，评估公司发展稳定性。',
-                '重大违法违规': '通过公开信息查询、媒体报道等，识别公司是否存在违法违规行为。',
-                '收入与成本': '分析公司收入确认政策、成本核算方法、财务数据一致性等，评估财务真实性。',
-                '财务内控不规范': '评估公司财务内部控制制度的完善程度和执行效果，识别内控缺陷。',
-                '客户与供应商': '分析公司主要客户和供应商的稳定性、集中度、信用状况等，评估经营风险。',
-                '资产质量与减值': '评估公司资产质量、减值计提的合理性、资产价值等，识别资产风险。',
-                '研发与技术': '分析公司研发投入、技术储备、创新能力等，评估技术发展潜力。',
-                '募集资金用途': '评估募集资金使用的合规性、效率性、项目进展等，识别资金使用风险。',
-                '突击分红与对赌协议': '识别公司突击分红行为、对赌协议条款等，评估股东权益风险。',
-                '市场传闻与负面报道': '监控市场传闻、媒体报道等，识别声誉风险和舆情风险。',
-                '行业政策与环境': '分析行业政策变化、外部环境变化等，评估政策风险和经营风险。'
+                '同业竞争': '通过分析公司业务范围市场份额竞争对手信息等识别是否存在同业竞争关系?,
+                '股权与控制权': '分析公司股权结构股东背景控制权变更历史等评估控制权稳定性?,
+                '关联交易': '识别公司与股东实际控制人关联企业之间的交易评估交易的必要性和公允性?,
+                '历史沿革与股东核?: '梳理公司发展历史股东变更记录重要事件等评估公司发展稳定性?,
+                '重大违法违规': '通过公开信息查询媒体报道等识别公司是否存在违法违规行为?,
+                '收入与成?: '分析公司收入确认政策成本核算方法财务数据一致性等评估财务真实性?,
+                '财务内控不规?: '评估公司财务内部控制制度的完善程度和执行效果识别内控缺陷?,
+                '客户与供应商': '分析公司主要客户和供应商的稳定性集中度信用状况等评估经营风险?,
+                '资产质量与减?: '评估公司资产质量减值计提的合理性资产价值等识别资产风险?,
+                '研发与技?: '分析公司研发投入技术储备创新能力等评估技术发展潜力?,
+                '募集资金用?: '评估募集资金使用的合规性效率性项目进展等识别资金使用风险?,
+                '突击分红与对赌协?: '识别公司突击分红行为对赌协议条款等评估股东权益风险?,
+                '市场传闻与负面报?: '监控市场传闻媒体报道等识别声誉风险和舆情风险?,
+                '行业政策与环?: '分析行业政策变化外部环境变化等评估政策风险和经营风险?
             };
-            return criteria[tagName] || '该标签暂无识别标准说明。';
+            return criteria[tagName] || '该标签暂无识别标准说明?;
         }
         
         // 获取情感等级描述
         function getSentimentLevelDescription(level) {
             const descriptions = {
-                '正面': '内容整体呈现积极、正面的情感倾向，对公司或行业有利。',
-                '中性': '内容情感倾向不明显，保持客观中立的表述。',
-                '负面一级': '内容存在轻微的负面情感，但影响程度较低。',
-                '负面二级': '内容存在明显的负面情感，可能对公司或行业产生一定影响。',
-                '负面三级': '内容存在严重的负面情感，可能对公司或行业产生重大影响。',
-                '未知': '无法确定内容的情感倾向，需要进一步分析。'
+                '正面': '内容整体呈现积极正面的情感倾向对公司或行业有利?,
+                '中?: '内容情感倾向不明显保持客观中立的表述?,
+                '负面一?: '内容存在轻微的负面情感但影响程度较低?,
+                '负面二级': '内容存在明显的负面情感可能对公司或行业产生一定影响?,
+                '负面三级': '内容存在严重的负面情感可能对公司或行业产生重大影响?,
+                '未知': '无法确定内容的情感倾向需要进一步分析?
             };
-            return descriptions[level] || '该情感等级暂无详细说明。';
+            return descriptions[level] || '该情感等级暂无详细说明?;
         }
         
         // 高级搜索切换
@@ -1122,15 +1108,14 @@
         
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('页面加载完成，搜索功能已初始化');
+            console.log('页面加载完成搜索功能已初始?);
         });
         
-        // 获取情感等级对应的CSS类
-        function getSentimentClass(level) {
+        // 获取情感等级对应的CSS?        function getSentimentClass(level) {
             const classMap = {
                 '正面': 'sentiment-positive',
-                '中性': 'sentiment-neutral',
-                '负面一级': 'sentiment-negative-1',
+                '中?: 'sentiment-neutral',
+                '负面一?: 'sentiment-negative-1',
                 '负面二级': 'sentiment-negative-2',
                 '负面三级': 'sentiment-negative-3',
                 '未知': 'sentiment-unknown'
@@ -1138,8 +1123,7 @@
             return classMap[level] || 'sentiment-unknown';
         }
         
-        // 全屏和关闭详情功能已移除，改为页面跳转方式
-    </script>
+        // 全屏和关闭详情功能已移除改为页面跳转方?    </script>
     <script src="/static/chat-widget.js"></script>
 </body>
 </html> 
