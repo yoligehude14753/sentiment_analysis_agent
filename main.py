@@ -506,7 +506,8 @@ async def batch_parse_data(request: Request):
                         dedup_result = deduplicate_database_records()
                         
                         if dedup_result['success']:
-                            yield f"data: {json.dumps({'type': 'log', 'message': f'去重完成！删除重复记录: {dedup_result["duplicates_removed"]}'})}\n\n"
+                            duplicates_removed = dedup_result['duplicates_removed']
+                            yield f"data: {json.dumps({'type': 'log', 'message': f'去重完成！删除重复记录: {duplicates_removed}'})}\n\n"
                             
                             # 执行自动导出
                             yield f"data: {json.dumps({'type': 'log', 'message': '正在执行自动导出...'})}\n\n"
@@ -515,11 +516,14 @@ async def batch_parse_data(request: Request):
                             export_result = auto_export_after_dedup()
                             
                             if export_result['success']:
-                                yield f"data: {json.dumps({'type': 'log', 'message': f'自动导出完成！文件: {export_result["export_file"]}'})}\n\n"
+                                export_file = export_result['export_file']
+                                yield f"data: {json.dumps({'type': 'log', 'message': f'自动导出完成！文件: {export_file}'})}\n\n"
                             else:
-                                yield f"data: {json.dumps({'type': 'warning', 'message': f'自动导出失败: {export_result["message"]}'})}\n\n"
+                                export_error = export_result['message']
+                                yield f"data: {json.dumps({'type': 'warning', 'message': f'自动导出失败: {export_error}'})}\n\n"
                         else:
-                            yield f"data: {json.dumps({'type': 'warning', 'message': f'去重失败: {dedup_result["message"]}'})}\n\n"
+                            dedup_error = dedup_result['message']
+                            yield f"data: {json.dumps({'type': 'warning', 'message': f'去重失败: {dedup_error}'})}\n\n"
                             
                     except Exception as e:
                         yield f"data: {json.dumps({'type': 'warning', 'message': f'自动去重导出过程中发生错误: {str(e)}'})}\n\n"
